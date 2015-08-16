@@ -34,11 +34,12 @@ class AggregateAutoloader implements iSplAutoloader
     function __construct()
     {
         // Attach Default Autoloaders:
-        ## register, so we can access other classes
+        ## register, so we can access related autoloader classes
         $autoloader = new NamespaceAutoloader(['Poirot\\Autoloader' => __DIR__]);
         $autoloader->register();
 
         $this->attach($autoloader);
+        $this->attach(new ClassMapAutoloader);
     }
 
     // Implement Specific AggregateAutoloader Methods:
