@@ -1,14 +1,12 @@
 <?php
 namespace Poirot\Autoloader;
 
-use Poirot\Autoloader\Interfaces\iSplAutoloader;
-
 if (class_exists('Poirot\\Autoloader\\NamespaceAutoloader'))
     return;
 
-require_once __DIR__.'/Interfaces/iSplAutoloader.php';
+require_once __DIR__.'/AbstractAutoloader.php';
 
-class NamespaceAutoloader implements iSplAutoloader
+class NamespaceAutoloader extends AbstractAutoloader
 {
     /**
      * @var array Registered Namespaces
@@ -27,36 +25,6 @@ class NamespaceAutoloader implements iSplAutoloader
         if ($namespaces)
             $this->setNamespaces($namespaces);
     }
-
-    // Implement iSplAutoloader:
-
-    /**
-     * Register to spl autoloader
-     *
-     * <code>
-     * spl_autoload_register(callable);
-     * </code>
-     *
-     * @return void
-     */
-    function register()
-    {
-        spl_autoload_register([$this, 'attainClass']);
-    }
-
-    /**
-     * Unregister from spl autoloader
-     *
-     * ! using same callable on register
-     *
-     * @return void
-     */
-    function unregister()
-    {
-        spl_autoload_unregister([$this, 'attainClass']);
-    }
-
-    // Implement StandardAutoloader Specific:
 
     /**
      * Autoload Class Callable
