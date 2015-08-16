@@ -79,6 +79,6 @@ class ClassMapAutoloader extends AbstractAutoloader
      */
     function attainClass($class)
     {
-        (!isset($this->__classMap[$class])) ?: require_once $class;
+        (!isset($this->__classMap[$class])) ?: require_once $this->__classMap[$class];
     }
 }
