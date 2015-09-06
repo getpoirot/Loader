@@ -1,7 +1,7 @@
 <?php
-namespace Poirot\Autoloader\Interfaces;
+namespace Poirot\Loader\Interfaces;
 
-interface iSplAutoloader 
+interface iSplAutoloader extends iLoader
 {
     /**
      * Register to spl autoloader
@@ -22,4 +22,4 @@ interface iSplAutoloader
      * @return void
      */
     function unregister();
-} 
+}

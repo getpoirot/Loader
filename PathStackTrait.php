@@ -1,47 +1,30 @@
 <?php
-namespace Poirot\Autoloader;
+namespace Poirot\Loader;
 
-if (class_exists('Poirot\\Autoloader\\NamespaceAutoloader'))
-    return;
-
-require_once __DIR__.'/AbstractAutoloader.php';
-
-class NamespaceAutoloader extends AbstractAutoloader
+trait PathStackTrait
 {
     /**
      * @var array Registered Namespaces
      */
-    protected $__namespaces = [
-        # 'namespace' => ['path/dir/', 'other/path/dir'],
+    protected $__pathStacks = [
+        # 'path/stack' => ['path/dir/', 'other/path/dir'],
     ];
 
     /**
-     * Construct
+     * Resolve To Resource
      *
-     * @param array $namespaces
+     * @param string   $resource
+     * @param callable $watch
+     *
+     * @return VOID|false|mixed
      */
-    function __construct(array $namespaces = [])
-    {
-        if ($namespaces)
-            $this->setNamespaces($namespaces);
-    }
-
-    /**
-     * Autoload Class Callable
-     *
-     * - must not throw exception
-     *
-     * @param string $class Class Name
-     *
-     * @return void
-     */
-    function attainClass($class)
+    function resolve($resource, \Closure $watch = null)
     {
         // find best namespace match and list in queue:
         ## it will reduce filesystem actions to find class
         $matched = []; $nearest = '';
-        foreach(array_keys($this->__namespaces) as $namespace) {
-            if (strpos($class, $namespace) === false)
+        foreach(array_keys($this->__pathStacks) as $namespace) {
+            if (strpos($resource, $namespace) === false)
                 continue;
 
             if (strlen($namespace) > strlen($nearest)) {
@@ -52,45 +35,51 @@ class NamespaceAutoloader extends AbstractAutoloader
             }
         }
 
+        $resolved = [];
+
         // search for class library file:
         foreach($matched as $namespace) {
-            ## $namespace    = 'Poirot\Autoloader'
-            ## $class        = 'Poirot\Autoloader\ClassMapAutoloader'
+            ## $namespace    = 'Poirot\Loader'
+            ## $class        = 'Poirot\Loader\ClassMapAutoloader'
             ## $maskOffClass = '\ClassMapAutoloader'
-            $maskOffClass = substr($class, strlen($namespace), strlen($class));
+            $maskOffClass = substr($resource, strlen($namespace), strlen($resource));
 
-            foreach($this->__namespaces[$namespace] as $dir) {
+            foreach($this->__pathStacks[$namespace] as $dir) {
                 $resolvedFile =
                     $this->__normalizeDir($dir)
-                    . $this->__classToFilePath($maskOffClass);
+                    . $this->__normalizeResourceName($maskOffClass);
 
-                if (file_exists($resolvedFile)) {
-                    require $resolvedFile;
+                ($watch === null) ?: $resolvedFile = $watch($resolvedFile);
+                if ($resolvedFile === false)
+                    return false;
 
-                    return; ## file resolved return from function
-                }
+                $resolved[] = $resolvedFile;
             }
         }
+
+        return (empty($resolved)) ? false : array_reverse($resolved);
     }
 
     /**
-     * Set Namespaces Directory Pair
+     * Set Stack Namespace Directory Pair
      *
-     * @param array $namespaces Associative Array as namespace=>dir
+     * ! Associative Array as [namespace => dir]
+     *
+     * @param array $namespaces
      *
      * @return $this
      */
-    function setNamespaces(array $namespaces)
+    function setStackArray(array $namespaces)
     {
         foreach($namespaces as $namespace => $dir)
             if (is_string($namespace) && is_string($dir))
-                $this->setNamespace($namespace, $dir);
+                $this->setStack($namespace, $dir);
 
         return $this;
     }
 
     /**
-     * Set Namespace Directory Pair
+     * Set Stack Directory Pair
      *
      * @param string $namespace
      * @param string $dir
@@ -98,7 +87,7 @@ class NamespaceAutoloader extends AbstractAutoloader
      * @throws \InvalidArgumentException
      * @return $this
      */
-    function setNamespace($namespace, $dir)
+    function setStack($namespace, $dir)
     {
         if (!is_dir($dir))
             throw new \InvalidArgumentException(sprintf(
@@ -107,11 +96,11 @@ class NamespaceAutoloader extends AbstractAutoloader
             ));
 
         $namespace = trim($namespace, '\\');
-        if (!array_key_exists($namespace, $this->__namespaces))
-            $this->__namespaces[$namespace] = [];
+        if (!array_key_exists($namespace, $this->__pathStacks))
+            $this->__pathStacks[$namespace] = [];
 
         # each registered namespace can spliced on multiple directory
-        $this->__namespaces[$namespace][] = $dir;
+        $this->__pathStacks[$namespace][] = $dir;
 
         return $this;
     }
@@ -138,10 +127,10 @@ class NamespaceAutoloader extends AbstractAutoloader
      *
      * @return string
      */
-    protected function __classToFilePath($maskOffClass)
+    protected function __normalizeResourceName($maskOffClass)
     {
         $maskOffClass = ltrim($maskOffClass, '\\');
 
-        return '/'. $this->__normalizeDir($maskOffClass).'.php';
+        return '/'. $this->__normalizeDir($maskOffClass);
     }
 }

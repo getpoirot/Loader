@@ -1,6 +1,6 @@
 {
-    "name": "poirot/autoloader",
-    "description": "Autoloading classes",
+    "name": "poirot/loader",
+    "description": "AutoLoading/Resolver libraries.",
     "type"       : "library",
     "authors": [
         {
@@ -9,10 +9,10 @@
             "role": "Developer"
         }
     ],
-    "target-dir": "Poirot/Autoloader",
+    "target-dir": "Poirot/Loader",
     "autoload"  : {
         "psr-0": {
-            "Poirot\\Autoloader": "."
+            "Poirot\\Loader": "."
         }
     }
 }

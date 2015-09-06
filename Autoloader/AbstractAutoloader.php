@@ -1,12 +1,12 @@
 <?php
-namespace Poirot\Autoloader;
+namespace Poirot\Loader\Autoloader;
 
-use Poirot\Autoloader\Interfaces\iSplAutoloader;
+use Poirot\Loader\Interfaces\iSplAutoloader;
 
-if (class_exists('Poirot\\Autoloader\\AbstractAutoloader'))
+if (class_exists('Poirot\\Loader\\Autoloader\\AbstractAutoloader'))
     return;
 
-require_once __DIR__.'/Interfaces/iSplAutoloader.php';
+require_once __DIR__ . '/../Interfaces/iSplAutoloader.php';
 
 abstract class AbstractAutoloader implements iSplAutoloader
 {
@@ -21,7 +21,7 @@ abstract class AbstractAutoloader implements iSplAutoloader
      *
      * @return void
      */
-    abstract function attainClass($class);
+    abstract function resolve($class);
 
     /**
      * Register to spl autoloader
@@ -34,7 +34,7 @@ abstract class AbstractAutoloader implements iSplAutoloader
      */
     function register()
     {
-        spl_autoload_register([$this, 'attainClass']);
+        spl_autoload_register([$this, 'resolve']);
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractAutoloader implements iSplAutoloader
      */
     function unregister()
     {
-        spl_autoload_unregister([$this, 'attainClass']);
+        spl_autoload_unregister([$this, 'resolve']);
     }
 }
  

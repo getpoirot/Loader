@@ -1,13 +1,13 @@
 <?php
-namespace Poirot\Autoloader;
+namespace Poirot\Loader;
 
-use Poirot\Autoloader\Interfaces\iSplAutoloader;
+use Poirot\Loader\Interfaces\iSplAutoloader;
 
-if (class_exists('Poirot\\Autoloader\\AggregateAutoloader'))
+if (class_exists('Poirot\\Loader\\AggregateAutoloader'))
     return;
 
-require_once __DIR__.'/NamespaceAutoloader.php';
-require_once __DIR__.'/Interfaces/iSplAutoloader.php';
+require_once __DIR__ . '/NamespaceAutoloader.php';
+require_once __DIR__ . '/Interfaces/iSplAutoloader.php';
 
 class AggregateAutoloader implements iSplAutoloader
 {
@@ -35,7 +35,7 @@ class AggregateAutoloader implements iSplAutoloader
     {
         // Attach Default Autoloaders:
         ## register, so we can access related autoloader classes
-        $autoloader = new NamespaceAutoloader(['Poirot\\Autoloader' => __DIR__]);
+        $autoloader = new NamespaceAutoloader(['Poirot\\Loader' => __DIR__]);
         $autoloader->register();
 
         $this->attach($autoloader);
