@@ -16,7 +16,7 @@ trait PathStackTrait
      * @param string   $resource
      * @param callable $watch
      *
-     * @return VOID|false|mixed
+     * @return false|mixed
      */
     function resolve($resource, \Closure $watch = null)
     {
