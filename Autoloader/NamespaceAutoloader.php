@@ -36,12 +36,12 @@ class NamespaceAutoloader extends AbstractAutoloader
      */
     function resolve($class)
     {
-        $this->__t_resolve($class, function($resolvedFile) {
+        $this->__t_resolve($class, function(&$resolvedFile) {
             if (file_exists($file = $resolvedFile.'.php')) {
                 require_once $file;
 
                 ## stop propagation
-                return false;
+                return true;
             }
 
             return $resolvedFile;

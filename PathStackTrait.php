@@ -13,10 +13,17 @@ trait PathStackTrait
     /**
      * Resolve To Resource
      *
+     * $watch
+     * function(&$resolved) {
+     *    $resolved .= '.php';
+     *    ## to stop propagation, and return $resolved
+     *    return true;
+     * }
+     *
      * @param string   $resource
      * @param callable $watch
      *
-     * @return false|mixed
+     * @return false|array|mixed
      */
     function resolve($resource, \Closure $watch = null)
     {
@@ -34,30 +41,34 @@ trait PathStackTrait
                 array_push($matched, $namespace);
             }
         }
-
-        $resolved = [];
+        // push wildcard star '*' namespace to matched if exists
+        if (array_key_exists('*', $this->__pathStacks))
+            array_push($matched, '*');
 
         // search for class library file:
         foreach($matched as $namespace) {
             ## $namespace    = 'Poirot\Loader'
             ## $class        = 'Poirot\Loader\ClassMapAutoloader'
             ## $maskOffClass = '\ClassMapAutoloader'
-            $maskOffClass = substr($resource, strlen($namespace), strlen($resource));
+            $maskOffClass = ($namespace == '*')
+                ? $resource
+                : substr($resource, strlen($namespace), strlen($resource));
 
             foreach($this->__pathStacks[$namespace] as $dir) {
                 $resolvedFile =
                     $this->__normalizeDir($dir)
                     . $this->__normalizeResourceName($maskOffClass);
 
-                ($watch === null) ?: $resolvedFile = $watch($resolvedFile);
-                if ($resolvedFile === false)
-                    return false;
-
-                $resolved[] = $resolvedFile;
+                if ($watch !== null) {
+                    $wResult = $watch($resolvedFile);
+                    if ($wResult === true)
+                        ### return achieved library
+                        return $resolvedFile;
+                }
             }
         }
 
-        return (empty($resolved)) ? false : array_reverse($resolved);
+        return false;
     }
 
     /**
@@ -81,6 +92,9 @@ trait PathStackTrait
     /**
      * Set Stack Directory Pair
      *
+     * - namespace can be '*' and checked after nearest
+     *   namespace detection
+     *
      * @param string $namespace
      * @param string $dir
      *
@@ -89,6 +103,12 @@ trait PathStackTrait
      */
     function setStack($namespace, $dir)
     {
+        if (!is_string($namespace) || empty($namespace))
+            throw new \InvalidArgumentException(sprintf(
+                'Namespace must be valid string but (%s) given.'
+                , is_object($namespace) ? get_class($namespace) : gettype($namespace).'('.$namespace.')'
+            ));
+
         if (!is_dir($dir))
             throw new \InvalidArgumentException(sprintf(
                 'Directory "%s" not available.'
