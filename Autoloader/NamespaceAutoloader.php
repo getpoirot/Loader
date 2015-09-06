@@ -12,7 +12,7 @@ class NamespaceAutoloader extends AbstractAutoloader
 {
     use PathStackTrait {
         PathStackTrait::resolve as protected __t_resolve;
-    };
+    }
 
     /**
      * Construct

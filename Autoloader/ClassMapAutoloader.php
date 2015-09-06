@@ -12,7 +12,7 @@ class ClassMapAutoloader extends AbstractAutoloader
 {
     use ResourceMapTrait {
         ResourceMapTrait::resolve as protected __t_resolve;
-    };
+    }
 
     /**
      * Construct

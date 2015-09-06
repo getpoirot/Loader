@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Loader;
+namespace Poirot\Loader\Autoloader;
 
 use Poirot\Loader\Interfaces\iSplAutoloader;
 
@@ -7,7 +7,7 @@ if (class_exists('Poirot\\Loader\\AggregateAutoloader'))
     return;
 
 require_once __DIR__ . '/NamespaceAutoloader.php';
-require_once __DIR__ . '/Interfaces/iSplAutoloader.php';
+require_once __DIR__ . '/../Interfaces/iSplAutoloader.php';
 
 class AggregateAutoloader implements iSplAutoloader
 {
@@ -43,6 +43,18 @@ class AggregateAutoloader implements iSplAutoloader
     }
 
     // Implement Specific AggregateAutoloader Methods:
+
+    /**
+     * Resolve To Resource
+     *
+     * @param mixed $resource
+     *
+     * @return mixed
+     */
+    function resolve($resource)
+    {
+        // TODO: Implement resolve() method.
+    }
 
     /**
      * Attach (insert) Autoloader

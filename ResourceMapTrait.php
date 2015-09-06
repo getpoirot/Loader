@@ -71,12 +71,12 @@ trait ResourceMapTrait
      *
      * @param string $resource
      *
-     * @return VOID|false|mixed
+     * @return false|mixed
      */
     function resolve($resource)
     {
         if (!isset($this->__mapResources[$resource]))
-            return (defined('VOID')) ? VOID : false;
+            return false;
 
         return $this->__mapResources[$resource];
     }
