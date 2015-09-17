@@ -2,15 +2,18 @@
 namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
+use SplPriorityQueue;
 
 trait AggregateTrait
 {
-    protected $_attachedLoader = [
-        'queue' => [/* ..iLoader */],
-        'names' => [
-            # Used to get loader instances
-            ## 'LoaderName_Or_ClassName' => iLoader
-        ],
+    /**
+     * @var \SplPriorityQueue
+     */
+    protected $_prioQuee;
+
+    protected $_t_loader_names = [
+        # Used to get loader instances
+        ## 'LoaderName_Or_ClassName' => iLoader
     ];
 
     /**
@@ -24,7 +27,7 @@ trait AggregateTrait
     {
         $resolve = false;
         /** @var iLoader $loader */
-        foreach($this->_attachedLoader['queue'] as $loader) {
+        foreach(clone $this->_prioQuee as $loader) {
             $resolve = call_user_func_array([$loader, 'resolve'], func_get_args());
             if ($resolve)
                 break;
@@ -37,15 +40,16 @@ trait AggregateTrait
      * Attach (insert) Loader
      *
      * @param iLoader $loader
+     * @param int     $priority
      *
      * @return $this
      */
-    function attach(iLoader $loader)
+    function attach(iLoader $loader, $priority = 0)
     {
-        $this->_attachedLoader['queue'][]  = $loader;
+        $this->_getPrioQuee()->insert($loader, $priority);
 
         $loaderClass = get_class($loader);
-        $this->_attachedLoader['names'][$loaderClass] = $loader;
+        $this->_t_loader_names[$loaderClass] = $loader;
 
         return $this;
     }
@@ -60,14 +64,13 @@ trait AggregateTrait
      */
     function loader($name)
     {
-        $list = $this->listAttached();
         if (!$this->hasAttached($name))
             throw new \Exception(sprintf(
                 'Loader with name (%s) has not attached.'
                 , $name
             ));
 
-        return $list[$name];
+        return $this->_t_loader_names[$name];
     }
 
     /**
@@ -79,18 +82,25 @@ trait AggregateTrait
      */
     function hasAttached($name)
     {
-        $list = $this->listAttached();
-
-        return array_key_exists($name, $list);
+        return in_array($name, $this->listAttached());
     }
 
     /**
      * Get Attached loader List
      *
-     * @return array Associate Array Of Name=>iLoader
+     * @return array Associate Array Of Name
      */
     function listAttached()
     {
-        return $this->_attachedLoader['names'];
+        return array_keys($this->_t_loader_names);
+    }
+
+    protected function _getPrioQuee()
+    {
+        if (!$this->_prioQuee)
+            ## standard spl queue to avoid using extra libraries
+            $this->_prioQuee = new SplPriorityQueue();
+
+        return $this->_prioQuee;
     }
 }

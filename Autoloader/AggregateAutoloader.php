@@ -50,7 +50,7 @@ class AggregateAutoloader implements iSplAutoloader
      */
     function register()
     {
-        foreach($this->_attachedLoader['queue'] as $i => $sa) {
+        foreach(clone $this->_getPrioQuee() as $i => $sa) {
             $objectHash = spl_object_hash($sa);
 
             if (array_key_exists($objectHash, $this->__tmp_registered_hash))
