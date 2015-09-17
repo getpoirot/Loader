@@ -3,6 +3,10 @@ namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
 
+/**
+ * TODO default watch resolver as option setter
+ */
+
 class PathStackLoader implements iLoader
 {
     use PathStackTrait;

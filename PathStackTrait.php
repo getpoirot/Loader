@@ -1,6 +1,10 @@
 <?php
 namespace Poirot\Loader;
 
+/**
+ * TODO default watch resolver as option setter
+ */
+
 trait PathStackTrait
 {
     /**
@@ -46,6 +50,9 @@ trait PathStackTrait
             array_push($matched, '*');
 
         // search for class library file:
+
+        ($watch !== null) ?: $watch = $this->__watch();
+
         foreach($matched as $namespace) {
             ## $namespace    = 'Poirot\Loader'
             ## $class        = 'Poirot\Loader\ClassMapAutoloader'
@@ -59,16 +66,26 @@ trait PathStackTrait
                     $this->__normalizeDir($dir)
                     . $this->__normalizeResourceName($maskOffClass);
 
-                if ($watch !== null) {
-                    $wResult = $watch($resolvedFile);
-                    if ($wResult === true)
-                        ### return achieved library
-                        return $resolvedFile;
-                }
+                $wResult = $watch($resolvedFile);
+                if ($wResult === true)
+                    ### return achieved library
+                    return $resolvedFile;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Default Watch Resolver
+     * - we can manipulate the final resolvedFile by reference
+     * @return callable
+     */
+    protected function __watch() {
+        return function(&$resolvedFile) {
+            ## if true resolve return $resolvedFile as result
+            return file_exists($resolvedFile);
+        };
     }
 
     /**

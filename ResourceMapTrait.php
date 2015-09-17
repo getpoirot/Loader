@@ -75,6 +75,7 @@ trait ResourceMapTrait
      */
     function resolve($resource)
     {
+        $resource = (string) $resource;
         if (!isset($this->__mapResources[$resource]))
             return false;
 
