@@ -33,7 +33,7 @@ trait ResourceMapTrait
     function setMapArray(array $maps)
     {
         # previous registered keys not replaced
-        $this->__mapResources = \Poirot\Core\array_merge($maps, $this->__mapResources);
+        $this->__mapResources = array_merge($maps, $this->__mapResources);
 
         return $this;
     }

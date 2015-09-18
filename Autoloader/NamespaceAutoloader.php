@@ -7,6 +7,7 @@ if (class_exists('Poirot\\Loader\\Autoloader\\NamespaceAutoloader'))
     return;
 
 require_once __DIR__ . '/AbstractAutoloader.php';
+require_once __DIR__ . '/../PathStackTrait.php';
 
 class NamespaceAutoloader extends AbstractAutoloader
 {

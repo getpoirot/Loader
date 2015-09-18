@@ -30,11 +30,13 @@ abstract class AbstractAutoloader implements iSplAutoloader
      * spl_autoload_register(callable);
      * </code>
      *
+     * @param bool $prepend
+     *
      * @return void
      */
-    function register()
+    function register($prepend = false)
     {
-        spl_autoload_register([$this, 'resolve']);
+        spl_autoload_register([$this, 'resolve'], true, $prepend);
     }
 
     /**
