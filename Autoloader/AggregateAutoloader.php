@@ -35,7 +35,7 @@ class AggregateAutoloader extends AbstractAutoloader
     function __construct(array $options = [])
     {
         ## register, so we can access related autoloader classes
-        $autoloader = new NamespaceAutoloader(['Poirot\\Loader' => dirname(__DIR__)]);
+        $autoloader = new NamespaceAutoloader(['Poirot\\Loader' => [dirname(__DIR__)]]);
         $autoloader->register(true);
 
         if (!empty($options))

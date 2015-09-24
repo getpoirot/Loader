@@ -38,14 +38,12 @@ class NamespaceAutoloader extends AbstractAutoloader
     function resolve($class)
     {
         $this->__t_resolve($class, function(&$resolvedFile) {
-            if (file_exists($file = $resolvedFile.'.php')) {
-                require_once $file;
+            $file = $resolvedFile.'.php';
+            // TODO fix multiple directory definition for namespaces
+            require_once $file;
 
-                ## stop propagation
-                return true;
-            }
-
-            return $resolvedFile;
+            ## stop propagation
+            return true;
         });
     }
 }

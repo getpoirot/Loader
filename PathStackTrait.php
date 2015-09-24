@@ -12,6 +12,7 @@ trait PathStackTrait
 
     protected $_c__sort_stack = false;
     protected $_c__normalize  = [];
+    protected $_c__matched     = [];
 
     /**
      * Resolve To Resource
@@ -32,11 +33,21 @@ trait PathStackTrait
     {
         if (isset($this->__pathStacks[$resource])) {
             ## whole resource match exists in stack and resolved
-            if ($return = $this->__watchResolve($resource, $watch))
-                return $return;
+            foreach($this->__pathStacks[$resource] as $resolved) {
+                if ($return = $this->__watchResolve($resolved, $watch))
+                    return $return;
+            }
         }
 
+        foreach($this->_c__matched as $namespace)
+            if (strpos($resource, $namespace) === 0) {
+                if ($return = $this->attainFromNamespace($resource, $namespace, $watch))
+                    return $return;
+            }
+
         $matched = $this->_getMatchedFromStack($resource);
+        $this->_c__matched = array_merge($this->_c__matched, $matched);
+
         // push wildcard star '*' namespace to matched if exists
         if (array_key_exists('*', $this->__pathStacks))
             array_push($matched, '*');
@@ -44,21 +55,29 @@ trait PathStackTrait
 
         // search for class library file:
         foreach($matched as $namespace) {
-            ## $namespace    = 'Poirot\Loader'
-            ## $resource     = 'Poirot\Loader\ClassMapAutoloader'
-            ## $maskOffClass = '\ClassMapAutoloader'
-            $maskOffClass = ($namespace == '*')
-                ? $resource
-                : substr($resource, strlen($namespace), strlen($resource));
+            if ($return = $this->attainFromNamespace($resource, $namespace, $watch))
+                return $return;
+        }
 
-            foreach ($this->__pathStacks[$namespace] as $path) {
-                $resolved =
-                    $this->__normalizeDir($path)
-                    . $this->__normalizeResourceName($maskOffClass);
+        return false;
+    }
 
-                if ($return = $this->__watchResolve($resolved, $watch))
-                    return $resolved;
-            }
+    protected function attainFromNamespace($resource, $namespace, $watch)
+    {
+        ## $namespace    = 'Poirot\Loader'
+        ## $resource     = 'Poirot\Loader\ClassMapAutoloader'
+        ## $maskOffClass = '\ClassMapAutoloader'
+        $maskOffClass = ($namespace == '*')
+            ? $resource
+            : substr($resource, strlen($namespace), strlen($resource));
+
+        foreach ($this->__pathStacks[$namespace] as $path) {
+            $resolved =
+                $this->__normalizeDir($path)
+                . $this->__normalizeResourceName($maskOffClass);
+
+            if ($return = $this->__watchResolve($resolved, $watch))
+                return $resolved;
         }
 
         return false;
@@ -73,8 +92,10 @@ trait PathStackTrait
     {
         $matched = [];
 
-        if ($this->_c__sort_stack !== $this->__pathStacks)
-            ksort($this->__pathStacks) and $this->_c__sort_stack = $this->__pathStacks;
+        if ($this->_c__sort_stack !== $this->__pathStacks) {
+            ksort($this->__pathStacks);
+            $this->_c__sort_stack = $this->__pathStacks;
+        }
 
         // find best namespace match and list in queue:
         ## it will reduce filesystem actions to find class
@@ -189,8 +210,7 @@ trait PathStackTrait
      */
     function fromArray(array $namespaces)
     {
-        foreach($namespaces as $namespace => $dir)
-            $this->setStack($namespace, $dir);
+        $this->__pathStacks = array_merge($this->__pathStacks, $namespaces);
 
         return $this;
     }
