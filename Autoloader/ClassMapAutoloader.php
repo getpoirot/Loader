@@ -22,7 +22,7 @@ class ClassMapAutoloader extends AbstractAutoloader
     function __construct($options = null)
     {
         if ($options !== null)
-            $this->setMapResource($options);
+            $this->from($options);
     }
 
     /**

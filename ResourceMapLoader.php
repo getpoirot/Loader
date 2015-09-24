@@ -15,7 +15,7 @@ class ResourceMapLoader implements iLoader
     function __construct($options = null)
     {
         if ($options !== null)
-            $this->setMapResource($options);
+            $this->from($options);
     }
 }
  

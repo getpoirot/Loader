@@ -19,7 +19,7 @@ class PathStackLoader implements iLoader
     function __construct(array $namespaces = [])
     {
         if ($namespaces)
-            $this->setStackArray($namespaces);
+            $this->fromArray($namespaces);
     }
 }
  

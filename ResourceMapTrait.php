@@ -9,16 +9,37 @@ trait ResourceMapTrait
     protected $__mapResources = [];
 
     /**
+     * Resolve To Resource By Map
+     *
+     * @param string $resource
+     *
+     * @return false|mixed
+     */
+    function resolve($resource)
+    {
+        $resource = (string) $resource;
+        if (!isset($this->__mapResources[$resource]))
+            return false;
+
+        return $this->__mapResources[$resource];
+    }
+
+
+    /**
      * Set Map Resource
      *
-     * @param array|string $map
+     * @param array|string $resource
      *
      * @return $this
      */
-    function setMapResource($map)
+    function from($resource)
     {
-        (is_string($map))  ? $this->setMapFile($map)
-        : (!is_array($map) ?: $this->setMapArray($map));
+        if (is_string($resource))
+            $this->fromFile($resource);
+        elseif (is_array($resource))
+            $this->fromArray($resource);
+        else
+            throw new \InvalidArgumentException;
 
         return $this;
     }
@@ -30,7 +51,7 @@ trait ResourceMapTrait
      *
      * @return $this
      */
-    function setMapArray(array $maps)
+    function fromArray(array $maps)
     {
         # previous registered keys not replaced
         $this->__mapResources = array_merge($maps, $this->__mapResources);
@@ -46,7 +67,7 @@ trait ResourceMapTrait
      * @throws \Exception
      * @return $this
      */
-    function setMapFile($file)
+    function fromFile($file)
     {
         if (!file_exists($file))
             throw new \InvalidArgumentException(sprintf(
@@ -55,30 +76,8 @@ trait ResourceMapTrait
             ));
 
         $maps = include_once $file;
-        if (!is_array($maps))
-            throw new \Exception(sprintf(
-                'Map file "%s" must return array of "class=>path" pairs.',
-                $file
-            ));
-
-        $this->setMapArray($maps);
+        $this->fromArray($maps);
 
         return $this;
-    }
-
-    /**
-     * Resolve To Resource By Map
-     *
-     * @param string $resource
-     *
-     * @return false|mixed
-     */
-    function resolve($resource)
-    {
-        $resource = (string) $resource;
-        if (!isset($this->__mapResources[$resource]))
-            return false;
-
-        return $this->__mapResources[$resource];
     }
 }

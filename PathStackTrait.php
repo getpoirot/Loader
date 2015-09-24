@@ -1,10 +1,6 @@
 <?php
 namespace Poirot\Loader;
 
-/**
- * TODO default watch resolver as option setter
- */
-
 trait PathStackTrait
 {
     /**
@@ -88,6 +84,28 @@ trait PathStackTrait
         };
     }
 
+
+    /**
+     * Set Stack Namespace Directory Pair
+     *
+     * ! Associative Array as [namespace => dir]
+     *
+     * @param array|string $resource
+     *
+     * @return $this
+     */
+    function from($resource)
+    {
+        if (is_string($resource))
+            $this->fromFile($resource);
+        elseif (is_array($resource))
+            $this->fromArray($resource);
+        else
+            throw new \InvalidArgumentException;
+
+        return $this;
+    }
+
     /**
      * Set Stack Namespace Directory Pair
      *
@@ -97,14 +115,34 @@ trait PathStackTrait
      *
      * @return $this
      */
-    function setStackArray(array $namespaces)
+    function fromArray(array $namespaces)
     {
         foreach($namespaces as $namespace => $dir)
-            if (is_string($namespace) && is_string($dir))
-                $this->setStack($namespace, $dir);
+            $this->setStack($namespace, $dir);
 
         return $this;
     }
+
+    /**
+     * Set Stack Namespace Directory Pair From File
+     *
+     * ! File Return Associative Array as [namespace => dir]
+     *
+     * @param string $file
+     *
+     * @return $this
+     */
+    function fromFile($file)
+    {
+        if (!file_exists($file))
+            return $this;
+
+        $namespaces = include $file;
+        $this->fromArray($namespaces);
+
+        return $this;
+    }
+
 
     /**
      * Set Stack Directory Pair
@@ -120,19 +158,9 @@ trait PathStackTrait
      */
     function setStack($namespace, $dir)
     {
-        if (!is_string($namespace) || empty($namespace))
-            throw new \InvalidArgumentException(sprintf(
-                'Namespace must be valid string but (%s) given.'
-                , is_object($namespace) ? get_class($namespace) : gettype($namespace).'('.$namespace.')'
-            ));
-
-        if (!is_dir($dir))
-            throw new \InvalidArgumentException(sprintf(
-                'Directory "%s" not available.'
-                , $dir
-            ));
-
         $namespace = trim($namespace, '\\');
+
+
         if (!array_key_exists($namespace, $this->__pathStacks))
             $this->__pathStacks[$namespace] = [];
 
@@ -141,6 +169,9 @@ trait PathStackTrait
 
         return $this;
     }
+
+
+    // ...
 
     /**
      * Normalize Directory Path

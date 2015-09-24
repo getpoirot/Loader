@@ -20,10 +20,10 @@ class NamespaceAutoloader extends AbstractAutoloader
      *
      * @param array $namespaces
      */
-    function __construct(array $namespaces = [])
+    function __construct($namespaces = null)
     {
-        if ($namespaces)
-            $this->setStackArray($namespaces);
+        if ($namespaces !== null)
+            $this->from($namespaces);
     }
 
     /**

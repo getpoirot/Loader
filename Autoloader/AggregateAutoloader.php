@@ -2,17 +2,15 @@
 namespace Poirot\Loader\Autoloader;
 
 use Poirot\Loader\AggregateTrait;
-use Poirot\Loader\Interfaces\iSplAutoloader;
 
 if (class_exists('Poirot\\Loader\\AggregateAutoloader'))
     return;
 
+require_once __DIR__ . '/AbstractAutoloader.php';
 require_once __DIR__ . '/NamespaceAutoloader.php';
-require_once __DIR__ . '/../Interfaces/iSplAutoloader.php';
 require_once __DIR__ . '/../AggregateTrait.php';
 
-
-class AggregateAutoloader implements iSplAutoloader
+class AggregateAutoloader extends AbstractAutoloader
 {
     use AggregateTrait;
 
@@ -27,61 +25,36 @@ class AggregateAutoloader implements iSplAutoloader
     /**
      * Construct
      *
+     * @param array $options
      */
-    function __construct()
+    function __construct(array $options = [])
     {
-        // Attach Default Autoloaders:
         ## register, so we can access related autoloader classes
         $autoloader = new NamespaceAutoloader(['Poirot\\Loader' => dirname(__DIR__)]);
         $autoloader->register(true);
 
-        $this->attach($autoloader);
-        $this->attach(new ClassMapAutoloader);
+        if (!empty($options))
+            $this->__conOptions($options);
 
+        ## unregister default autoloader after attaching
         $autoloader->unregister();
     }
 
-    // Implement iSplAutoloader:
+
+    // ...
 
     /**
-     * Register to spl autoloader
-     *
-     * <code>
-     * spl_autoload_register(callable);
-     * </code>
-     *
-     * @param bool $prepend
-     *
-     * @return void
+     * Setup Class With Options
+     * @param array $options
      */
-    function register($prepend = false)
+    protected function __conOptions(array $options)
     {
-        foreach(clone $this->_getPrioQuee() as $i => $sa) {
-            $objectHash = spl_object_hash($sa);
+        foreach($options as $loader => $loaderOptions) {
+            if (!class_exists($loader))
+                $loader = __NAMESPACE__.'\\'.$loader;
 
-            if (array_key_exists($objectHash, $this->__tmp_registered_hash))
-                // registered before
-                return;
-
-            /** @var iSplAutoloader $sa */
-            $sa->register($prepend);
-            $this->__tmp_registered_hash[$objectHash] = $sa;
-        }
-    }
-
-    /**
-     * Unregister from spl autoloader
-     *
-     * ! using same callable on register
-     *
-     * @return void
-     */
-    function unregister()
-    {
-        foreach($this->__tmp_registered_hash as $i => $sa) {
-            /** @var iSplAutoloader $sa */
-            $sa->unregister();
-            unset($this->__tmp_registered_hash[$i]);
+            $loader = new $loader($loaderOptions);
+            $this->attach($loader);
         }
     }
 }
