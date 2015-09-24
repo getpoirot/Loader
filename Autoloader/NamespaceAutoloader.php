@@ -39,7 +39,9 @@ class NamespaceAutoloader extends AbstractAutoloader
     {
         return $this->__t_resolve($class, function(&$resolvedFile) {
             $file = $resolvedFile.'.php';
-            // TODO fix multiple directory definition for namespaces
+            if (!file_exists($file))
+                return false;
+            
             require_once $file;
 
             ## stop propagation
