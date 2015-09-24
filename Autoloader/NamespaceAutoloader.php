@@ -33,11 +33,11 @@ class NamespaceAutoloader extends AbstractAutoloader
      *
      * @param string $class Class Name
      *
-     * @return void
+     * @return mixed
      */
     function resolve($class)
     {
-        $this->__t_resolve($class, function(&$resolvedFile) {
+        return $this->__t_resolve($class, function(&$resolvedFile) {
             $file = $resolvedFile.'.php';
             // TODO fix multiple directory definition for namespaces
             require_once $file;

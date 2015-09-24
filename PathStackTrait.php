@@ -46,7 +46,7 @@ trait PathStackTrait
             }
 
         $matched = $this->_getMatchedFromStack($resource);
-        $this->_c__matched = array_merge($this->_c__matched, $matched);
+        $this->_c__matched = array_merge($matched, $this->_c__matched);
 
         // push wildcard star '*' namespace to matched if exists
         if (array_key_exists('*', $this->__pathStacks))
@@ -277,9 +277,7 @@ trait PathStackTrait
         if (isset($this->_c__normalize[$dir]))
             return $this->_c__normalize[$dir];
 
-        $dir = (strpos($dir, '\\') !== false) ? str_replace('\\', '/', $dir) : $dir;
-        $dir = rtrim($dir, '/');
-
+        $dir = rtrim(strtr($dir, '\\', '/'), '/');
         $this->_c__normalize[$dir] = $dir;
 
         return $dir;

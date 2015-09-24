@@ -32,12 +32,14 @@ class ClassMapAutoloader extends AbstractAutoloader
      *
      * @param string $class Class Name
      *
-     * @return void
+     * @return mixed
      */
     function resolve($class)
     {
         $resolved = $this->__t_resolve($class);
         if ($resolved)
             require_once $resolved;
+
+        return $resolved;
     }
 }

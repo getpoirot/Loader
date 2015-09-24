@@ -19,7 +19,7 @@ abstract class AbstractAutoloader implements iSplAutoloader
      *
      * @param string $class Class Name
      *
-     * @return void
+     * @return mixed
      */
     abstract function resolve($class);
 
