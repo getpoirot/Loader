@@ -14,6 +14,11 @@ class AggregateAutoloader extends AbstractAutoloader
 {
     use AggregateTrait;
 
+    protected $_default_loaders = [
+        'NamespaceAutoloader' => 'Poirot\Loader\Autoloader\NamespaceAutoloader',
+        'ClassMapAutoloader'  => 'Poirot\Loader\Autoloader\ClassMapAutoloader',
+    ];
+
     /**
      * Tmp cache used to ignore recursion call for registered
      * autoloader objects
@@ -50,8 +55,8 @@ class AggregateAutoloader extends AbstractAutoloader
     protected function __conOptions(array $options)
     {
         foreach($options as $loader => $loaderOptions) {
-            if (!class_exists($loader))
-                $loader = __NAMESPACE__.'\\'.$loader;
+            if (isset($this->_default_loaders[$loader]))
+                $loader = $this->_default_loaders[$loader];
 
             $loader = new $loader($loaderOptions);
             $this->attach($loader);

@@ -10,6 +10,9 @@ trait PathStackTrait
         # 'path/stack' => ['path/dir/', 'other/path/dir'],
     ];
 
+    protected $_c__sort_stack = false;
+    protected $_c__normalize  = [];
+
     /**
      * Resolve To Resource
      *
@@ -27,49 +30,118 @@ trait PathStackTrait
      */
     function resolve($resource, \Closure $watch = null)
     {
-        // find best namespace match and list in queue:
-        ## it will reduce filesystem actions to find class
-        $matched = []; $nearest = '';
-        foreach(array_keys($this->__pathStacks) as $namespace) {
-            if (strpos($resource, $namespace) === false)
-                continue;
-
-            if (strlen($namespace) > strlen($nearest)) {
-                array_unshift($matched, $namespace);
-                $nearest = $namespace;
-            } else {
-                array_push($matched, $namespace);
-            }
+        if (isset($this->__pathStacks[$resource])) {
+            ## whole resource match exists in stack and resolved
+            if ($return = $this->__watchResolve($resource, $watch))
+                return $return;
         }
+
+        $matched = $this->_getMatchedFromStack($resource);
         // push wildcard star '*' namespace to matched if exists
         if (array_key_exists('*', $this->__pathStacks))
             array_push($matched, '*');
 
+
         // search for class library file:
-
-        ($watch !== null) ?: $watch = $this->__watch();
-
         foreach($matched as $namespace) {
             ## $namespace    = 'Poirot\Loader'
-            ## $class        = 'Poirot\Loader\ClassMapAutoloader'
+            ## $resource     = 'Poirot\Loader\ClassMapAutoloader'
             ## $maskOffClass = '\ClassMapAutoloader'
             $maskOffClass = ($namespace == '*')
                 ? $resource
                 : substr($resource, strlen($namespace), strlen($resource));
 
-            foreach($this->__pathStacks[$namespace] as $dir) {
-                $resolvedFile =
-                    $this->__normalizeDir($dir)
+            foreach ($this->__pathStacks[$namespace] as $path) {
+                $resolved =
+                    $this->__normalizeDir($path)
                     . $this->__normalizeResourceName($maskOffClass);
 
-                $wResult = $watch($resolvedFile);
-                if ($wResult === true)
-                    ### return achieved library
-                    return $resolvedFile;
+                if ($return = $this->__watchResolve($resolved, $watch))
+                    return $resolved;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Binary search for matching with requested resource namespace
+     * @param $resource
+     * @return array
+     */
+    protected function _getMatchedFromStack($resource, $rec_pathstack = null)
+    {
+        $matched = [];
+
+        if ($this->_c__sort_stack !== $this->__pathStacks)
+            ksort($this->__pathStacks) and $this->_c__sort_stack = $this->__pathStacks;
+
+        // find best namespace match and list in queue:
+        ## it will reduce filesystem actions to find class
+
+        $rec_pathstack = ($rec_pathstack === null)
+            ? $this->__pathStacks
+            : $rec_pathstack;
+
+        $keys = array_keys($rec_pathstack);
+
+        ## grab the middle
+        $midKey  = intval(count($keys) / 2);
+        $current = $keys[$midKey];
+
+        $term = strncasecmp($current, $resource, strlen($current));
+        if ($term === 0) {
+            ## match resource in stack
+            array_push($matched, $current);
+
+            ## looking fore next and previous keys to match
+
+            for($i = $midKey-1; $i >=0; $i--) {
+                ### previous
+                $current = $keys[$i];
+                $term    = strncasecmp($current, $resource, strlen($current));
+                if ($term !== 0)
+                    break;
+
+                ### only match for keys that contains resource name
+                array_push($matched, $current);
+            }
+
+            for($i = $midKey+1; $i < count($keys); $i++) {
+                ### next
+                $current = $keys[$i];
+                $term    = strncasecmp($current, $resource, strlen($current));
+                if ($term !== 0)
+                    break;
+
+                ### only match for keys that contains resource name
+                array_unshift($matched, $current); ### nearest to namespace
+            }
+
+            return $matched;
+        }
+
+        if ($term > 0)
+            return $this->_getMatchedFromStack($resource, array_splice($rec_pathstack, 0, $midKey));
+
+        // if ($term < 0)
+        return $this->_getMatchedFromStack($resource, array_splice($rec_pathstack, $midKey, count($keys)-1));
+    }
+
+    /**
+     * Speed up search by looking for whole namespace match-
+     * and resolve to it
+     *
+     * @param $resource
+     * @param $watch
+     * @return false|string
+     */
+    protected function __watchResolve($resource, $watch)
+    {
+        ($watch !== null) ?: $watch = $this->__watch();
+        $return   = $watch($resource);
+
+        return $return;
     }
 
     /**
@@ -182,8 +254,13 @@ trait PathStackTrait
      */
     protected function __normalizeDir($dir)
     {
+        if (isset($this->_c__normalize[$dir]))
+            return $this->_c__normalize[$dir];
+
         $dir = (strpos($dir, '\\') !== false) ? str_replace('\\', '/', $dir) : $dir;
         $dir = rtrim($dir, '/');
+
+        $this->_c__normalize[$dir] = $dir;
 
         return $dir;
     }
