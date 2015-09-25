@@ -91,6 +91,9 @@ trait PathStackTrait
     protected function _getMatchedFromStack($resource, $rec_pathstack = null)
     {
         $matched = [];
+        if (empty($rec_pathstack))
+            ## list is empty
+            return $matched;
 
         if ($this->_c__sort_stack !== $this->__pathStacks) {
             ksort($this->__pathStacks);

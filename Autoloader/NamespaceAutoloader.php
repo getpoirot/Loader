@@ -41,7 +41,7 @@ class NamespaceAutoloader extends AbstractAutoloader
             $file = $resolvedFile.'.php';
             if (!file_exists($file))
                 return false;
-            
+
             require_once $file;
 
             ## stop propagation
