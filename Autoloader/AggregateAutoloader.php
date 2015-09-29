@@ -13,20 +13,15 @@ require_once __DIR__ . '/../AggregateTrait.php';
 
 class AggregateAutoloader extends AbstractAutoloader
 {
-    use AggregateTrait {
-        AggregateTrait::loader as protected _t__loader;
-        AggregateTrait::listAttached as protected _t__listAttached;
-    }
+    use AggregateTrait;
+    /*use AggregateTrait {
+        -        AggregateTrait::loader as protected _t__loader;
+        -        AggregateTrait::listAttached as protected _t__listAttached;
+        -    }*/
 
     protected $_aliases = [
         'NamespaceAutoloader' => 'Poirot\Loader\Autoloader\NamespaceAutoloader',
         'ClassMapAutoloader'  => 'Poirot\Loader\Autoloader\ClassMapAutoloader',
-    ];
-
-    protected $_c__setup = [
-        ## alias or class name
-        # 'NamespaceAutoload' => $options
-        # 'Poirot\Loader\Autoloader\ClassMapAutoloader' => $options
     ];
 
     /**
@@ -51,15 +46,15 @@ class AggregateAutoloader extends AbstractAutoloader
      */
     function __construct(array $options = [])
     {
-        /*## register, so we can access related autoloader classes
+        ## register, so we can access related autoloader classes
         $autoloader = new NamespaceAutoloader(['Poirot\\Loader' => [dirname(__DIR__)]]);
-        $autoloader->register(true);*/
+        $autoloader->register(true);
 
         if (!empty($options))
             $this->__setupFromArray($options);
 
-        /*## unregister default autoloader after attaching
-        $autoloader->unregister();*/
+        ## unregister default autoloader after attaching
+        $autoloader->unregister();
     }
 
     /**
@@ -68,7 +63,7 @@ class AggregateAutoloader extends AbstractAutoloader
      * @inheritdoc
      * @return iLoader
      */
-    function loader($name)
+    function _loader($name)
     {
         if (!$this->hasAttached($name))
             throw new \Exception(sprintf(
@@ -85,7 +80,7 @@ class AggregateAutoloader extends AbstractAutoloader
      * @inheritdoc
      * @return array Associate Array Of Name
      */
-    function listAttached()
+    function _listAttached()
     {
         $_t_attached = $this->_t__listAttached();
 
@@ -100,9 +95,7 @@ class AggregateAutoloader extends AbstractAutoloader
      */
     protected function __setupFromArray(array $options)
     {
-        $this->_c__setup = array_merge($this->_c__setup, $options);
-
-        /*foreach($options as $loader => $loaderOptions)
+        foreach($options as $loader => $loaderOptions)
         {
             if (!is_string($loader) && is_string($loaderOptions)) {
                 ## ['loaderClass', ..]
@@ -110,12 +103,16 @@ class AggregateAutoloader extends AbstractAutoloader
                 $loaderOptions = null;
             }
 
+            if (isset($this->_aliases[$loader]))
+                ## register alias name class
+                $loader = $this->_aliases[$loader];
+
             if ($loaderOptions)
                 $loader = new $loader($loaderOptions);
             else
                 $loader = new $loader;
 
             $this->attach($loader);
-        }*/
+        }
     }
 }
