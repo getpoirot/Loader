@@ -10,11 +10,16 @@ require_once __DIR__ . '/AbstractAutoloader.php';
 require_once __DIR__ . '/NamespaceAutoloader.php';
 require_once __DIR__ . '/../AggregateTrait.php';
 
+
+/**
+ * TODO lazy loading of autoload classes on loader()
+ */
+
 class AggregateAutoloader extends AbstractAutoloader
 {
     use AggregateTrait;
 
-    protected $_default_loaders = [
+    protected $_aliases = [
         'NamespaceAutoloader' => 'Poirot\Loader\Autoloader\NamespaceAutoloader',
         'ClassMapAutoloader'  => 'Poirot\Loader\Autoloader\ClassMapAutoloader',
     ];
@@ -30,6 +35,12 @@ class AggregateAutoloader extends AbstractAutoloader
     /**
      * Construct
      *
+     * Options:
+     * ['NamespaceAutoloader' => [
+     *    'Poirot\AaResponder'  => [APP_DIR_VENDOR.'/poirot/action-responder/Poirot/AaResponder'],
+     *    'Poirot\Application'  => [APP_DIR_VENDOR.'/poirot/application/Poirot/Application'],
+     * ]]
+     *
      * @param array $options
      */
     function __construct(array $options = [])
@@ -39,7 +50,7 @@ class AggregateAutoloader extends AbstractAutoloader
         $autoloader->register(true);
 
         if (!empty($options))
-            $this->__conOptions($options);
+            $this->__setupFromArray($options);
 
         ## unregister default autoloader after attaching
         $autoloader->unregister();
@@ -52,13 +63,21 @@ class AggregateAutoloader extends AbstractAutoloader
      * Setup Class With Options
      * @param array $options
      */
-    protected function __conOptions(array $options)
+    protected function __setupFromArray(array $options)
     {
-        foreach($options as $loader => $loaderOptions) {
-            if (isset($this->_default_loaders[$loader]))
-                $loader = $this->_default_loaders[$loader];
+        foreach($options as $loader => $loaderOptions)
+        {
+            if (!is_string($loader) && is_string($loaderOptions)) {
+                ## ['loaderClass', ..]
+                $loader = $loaderOptions;
+                $loaderOptions = null;
+            }
 
-            $loader = new $loader($loaderOptions);
+            if ($loaderOptions)
+                $loader = new $loader($loaderOptions);
+            else
+                $loader = new $loader;
+
             $this->attach($loader);
         }
     }
