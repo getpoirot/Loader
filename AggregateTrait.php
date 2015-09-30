@@ -27,7 +27,7 @@ trait AggregateTrait
     {
         $resolve = false;
         /** @var iLoader $loader */
-        foreach(clone $this->_prioQuee as $loader) {
+        foreach(clone $this->_getPrioQuee() as $loader) {
             $resolve = call_user_func_array([$loader, 'resolve'], func_get_args());
             if ($resolve)
                 break;

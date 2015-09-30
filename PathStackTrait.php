@@ -91,7 +91,7 @@ trait PathStackTrait
     protected function _getMatchedFromStack($resource, $rec_pathstack = null)
     {
         $matched = [];
-        if (empty($rec_pathstack))
+        if (empty($rec_pathstack) && $rec_pathstack !== null)
             ## list is empty
             return $matched;
 
