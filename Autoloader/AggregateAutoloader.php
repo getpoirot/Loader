@@ -11,26 +11,21 @@ require_once __DIR__ . '/AbstractAutoloader.php';
 require_once __DIR__ . '/NamespaceAutoloader.php';
 require_once __DIR__ . '/../AggregateTrait.php';
 
+/*
+ * TODO lazy loading for attached loaders
+ */
+
 class AggregateAutoloader extends AbstractAutoloader
 {
-    use AggregateTrait;
-    /*use AggregateTrait {
-        -        AggregateTrait::loader as protected _t__loader;
-        -        AggregateTrait::listAttached as protected _t__listAttached;
-        -    }*/
+    use AggregateTrait {
+        AggregateTrait::listAttached as protected _t__listAttached;
+        AggregateTrait::loader       as protected _t__loader;
+    }
 
     protected $_aliases = [
         'NamespaceAutoloader' => 'Poirot\Loader\Autoloader\NamespaceAutoloader',
         'ClassMapAutoloader'  => 'Poirot\Loader\Autoloader\ClassMapAutoloader',
     ];
-
-    /**
-     * Tmp cache used to ignore recursion call for registered
-     * autoloader objects
-     *
-     * @var array[hash=>iSplAutoloader]
-     */
-    protected $__tmp_registered_hash = [];
 
     /**
      * Construct
@@ -58,33 +53,28 @@ class AggregateAutoloader extends AbstractAutoloader
     }
 
     /**
-     * @override Using lazy loading
+     * @override get by aliased
      *
      * @inheritdoc
      * @return iLoader
      */
-    function _loader($name)
+    function loader($name)
     {
-        if (!$this->hasAttached($name))
-            throw new \Exception(sprintf(
-                'Loader with name (%s) has not attached.'
-                , $name
-            ));
+        if (isset($this->_aliases[$name]))
+            $name = $this->_aliases[$name];
 
-        return $this->_t_loader_names[$name];
+        return $this->_t__loader($name);
     }
 
     /**
-     * @override Lazy Loading
+     * @override list aliased
      *
      * @inheritdoc
      * @return array Associate Array Of Name
      */
-    function _listAttached()
+    function listAttached()
     {
-        $_t_attached = $this->_t__listAttached();
-
-        return array_merge($this->_c__setup, $_t_attached);
+        return array_merge(array_keys($this->_aliases), $this->_t__listAttached());
     }
 
     // ...
