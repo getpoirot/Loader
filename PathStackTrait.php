@@ -77,7 +77,7 @@ trait PathStackTrait
                 . $this->__normalizeResourceName($maskOffClass);
 
             if ($return = $this->__watchResolve($resolved, $watch))
-                return $resolved;
+                return $return;
         }
 
         return false;
@@ -112,6 +112,9 @@ trait PathStackTrait
         ## grab the middle
         $midKey  = intval(count($keys) / 2);
         $current = $keys[$midKey];
+
+        if ($current == '*')
+            return $matched;
 
         $term = strncasecmp($current, $resource, strlen($current));
         if ($term === 0) {
