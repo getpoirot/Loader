@@ -4,7 +4,7 @@ namespace Poirot\Loader\Autoloader;
 use Poirot\Loader\AggregateTrait;
 use Poirot\Loader\Interfaces\iLoader;
 
-if (class_exists('Poirot\\Loader\\AggregateAutoloader'))
+if (class_exists('Poirot\\Loader\\AggregateAutoloader' , false))
     return;
 
 require_once __DIR__ . '/AbstractAutoloader.php';
