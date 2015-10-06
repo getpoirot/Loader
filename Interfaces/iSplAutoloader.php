@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Loader\Interfaces;
 
-if (interface_exists('Poirot\\Loader\\Interfaces\\iSplAutoloader'))
+if (interface_exists('Poirot\\Loader\\Interfaces\\iSplAutoloader',false))
     return;
 
 require_once 'iLoader.php';
