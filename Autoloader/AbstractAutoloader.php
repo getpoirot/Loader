@@ -3,7 +3,7 @@ namespace Poirot\Loader\Autoloader;
 
 use Poirot\Loader\Interfaces\iSplAutoloader;
 
-if (class_exists('Poirot\\Loader\\Autoloader\\AbstractAutoloader'))
+if (class_exists('Poirot\\Loader\\Autoloader\\AbstractAutoloader' , false))
     return;
 
 require_once __DIR__ . '/../Interfaces/iSplAutoloader.php';

@@ -3,7 +3,7 @@ namespace Poirot\Loader\Autoloader;
 
 use Poirot\Loader\PathStackTrait;
 
-if (class_exists('Poirot\\Loader\\Autoloader\\NamespaceAutoloader'))
+if (class_exists('Poirot\\Loader\\Autoloader\\NamespaceAutoloader' , false))
     return;
 
 require_once __DIR__ . '/AbstractAutoloader.php';

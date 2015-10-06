@@ -3,7 +3,7 @@ namespace Poirot\Loader\Autoloader;
 
 use Poirot\Loader\ResourceMapTrait;
 
-if (class_exists('Poirot\\Loader\\Autoloader\\ClassMapAutoloader'))
+if (class_exists('Poirot\\Loader\\Autoloader\\ClassMapAutoloader' , false))
     return;
 
 require_once __DIR__ . '/AbstractAutoloader.php';
