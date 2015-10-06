@@ -85,8 +85,7 @@ class AggregateAutoloader extends AbstractAutoloader
      */
     protected function __setupFromArray(array $options)
     {
-        foreach($options as $loader => $loaderOptions)
-        {
+        foreach($options as $loader => $loaderOptions) {
             if (!is_string($loader) && is_string($loaderOptions)) {
                 ## ['loaderClass', ..]
                 $loader = $loaderOptions;
