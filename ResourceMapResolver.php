@@ -3,7 +3,7 @@ namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
 
-class ResourceMapLoader implements iLoader
+class ResourceMapResolver implements iLoader
 {
     use ResourceMapTrait;
 
