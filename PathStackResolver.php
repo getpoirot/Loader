@@ -7,7 +7,7 @@ use Poirot\Loader\Interfaces\iLoader;
  * TODO default watch resolver as option setter
  */
 
-class PathStackLoader implements iLoader
+class PathStackResolver implements iLoader
 {
     use PathStackTrait;
 
