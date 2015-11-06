@@ -179,7 +179,7 @@ trait PathStackTrait
     protected function __watch() {
         return function(&$resolvedFile) {
             ## if true resolve return $resolvedFile as result
-            return file_exists($resolvedFile);
+            return !file_exists($resolvedFile) ?: $resolvedFile;
         };
     }
 
