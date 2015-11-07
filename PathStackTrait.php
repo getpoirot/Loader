@@ -31,6 +31,10 @@ trait PathStackTrait
      */
     function resolve($resource, \Closure $watch = null)
     {
+        $resource = (string) $resource;
+        if ($resource === '')
+            return false;
+
         if (isset($this->__pathStacks[$resource])) {
             ## whole resource match exists in stack and resolved
             foreach($this->__pathStacks[$resource] as $resolved) {
