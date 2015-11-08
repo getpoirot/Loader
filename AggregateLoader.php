@@ -12,15 +12,9 @@ class AggregateLoader implements iLoader
      *
      * @param array $options
      */
-    function __construct(array $options = [])
+    function __construct(array $options = null)
     {
-        if (isset($options['attach'])) {
-            $attach = $options['attach'];
-            if(!is_array($attach))
-                $attach = [$attach];
-
-            foreach($attach as $loader)
-                $this->attach($loader);
-        }
+        if ($options !== null)
+            $this->from($options);
     }
 }

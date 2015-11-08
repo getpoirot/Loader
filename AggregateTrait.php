@@ -16,6 +16,28 @@ trait AggregateTrait
         ## 'LoaderName_Or_ClassName' => iLoader
     ];
 
+    function from($resource)
+    {
+        if (is_array($resource))
+            $this->fromArray($resource);
+
+        return $this;
+    }
+
+    function fromArray(array $options)
+    {
+        if (isset($options['attach'])) {
+            $attach = $options['attach'];
+            if(!is_array($attach))
+                $attach = [$attach];
+
+            foreach($attach as $pr => $loader)
+                $this->attach($loader, $pr);
+        }
+
+        return $this;
+    }
+
     /**
      * Resolve To Resource
      *
