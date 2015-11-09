@@ -32,7 +32,7 @@ trait PathStackTrait
     function resolve($resource, \Closure $watch = null)
     {
         $resource = (string) $resource;
-        if ($resource === '')
+        if ($resource === '' || empty($this->__pathStacks))
             return false;
 
         if (isset($this->__pathStacks[$resource])) {
