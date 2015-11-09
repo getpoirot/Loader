@@ -16,6 +16,13 @@ trait AggregateTrait
         ## 'LoaderName_Or_ClassName' => iLoader
     ];
 
+    /**
+     * Setup Aggregate Loader
+     *
+     * @param array $resource
+     *
+     * @return $this
+     */
     function from($resource)
     {
         if (is_array($resource))
@@ -24,6 +31,13 @@ trait AggregateTrait
         return $this;
     }
 
+    /**
+     * Setup Aggregate Loader
+     *
+     * @param array $options
+     *
+     * @return $this
+     */
     function fromArray(array $options)
     {
         if (isset($options['attach'])) {
