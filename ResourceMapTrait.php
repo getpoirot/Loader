@@ -18,7 +18,7 @@ trait ResourceMapTrait
     function resolve($resource)
     {
         $resource = (string) $resource;
-        if (!isset($this->__mapResources[$resource]))
+        if (!array_key_exists($resource, $this->__mapResources))
             return false;
 
         return $this->__mapResources[$resource];
@@ -55,7 +55,6 @@ trait ResourceMapTrait
     {
         # previous registered keys not replaced
         $this->__mapResources = array_merge($maps, $this->__mapResources);
-
         return $this;
     }
 
