@@ -17,7 +17,7 @@ trait PathStackTrait
     /**
      * Resolve To Resource
      *
-     * $watch
+     * $watch:
      * function(&$resolved) {
      *    $resolved .= '.php';
      *    ## to stop propagation, and return $resolved
@@ -25,7 +25,7 @@ trait PathStackTrait
      * }
      *
      * @param string   $resource
-     * @param callable $watch
+     * @param \Closure $watch
      *
      * @return false|array|mixed
      */
@@ -74,6 +74,11 @@ trait PathStackTrait
         $maskOffClass = ($namespace == '*')
             ? $resource
             : substr($resource, strlen($namespace), strlen($resource));
+
+        if (!is_array($this->__pathStacks[$namespace]))
+            ## Allow Loader Config Defined as:
+            ## 'Poirot' => __DIR__, instead of 'Poirot' => [__DIR__, ..],
+            $this->__pathStacks[$namespace] = [$this->__pathStacks[$namespace]];
 
         foreach ($this->__pathStacks[$namespace] as $path) {
             $resolved =
