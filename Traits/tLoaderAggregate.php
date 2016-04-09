@@ -20,8 +20,17 @@ trait tLoaderAggregate
     /**
      * Build Object With Provided Options
      * > Setup Aggregate Loader
+     *   Options:
+     *  [
+     *    'attach' => [0 => iLoader, $priority => iLoader],
+     *    'Registered\ClassLoader' => [
+             // Options
+     *       'Poirot\AaResponder'  => [APP_DIR_VENDOR.'/poirot/action-responder/Poirot/AaResponder'],
+     *       'Poirot\Application'  => [APP_DIR_VENDOR.'/poirot/application/Poirot/Application'],
+     *    ]
+     *  ]
      *
-     * @param array $options Associated Array
+     * @param array $options       Associated Array
      * @param bool $throwException Throw Exception On Wrong Option
      *
      * @throws \Exception
@@ -29,6 +38,7 @@ trait tLoaderAggregate
      */
     function with(array $options, $throwException = false)
     {
+        # Attach Loader:
         if (isset($options['attach'])) {
             $attach = $options['attach'];
             if(!is_array($attach))
@@ -36,8 +46,27 @@ trait tLoaderAggregate
 
             foreach($attach as $pr => $loader)
                 $this->attach($loader, $pr);
-        } elseif($throwException)
-            throw new \InvalidArgumentException('Required Option "attach" not defined.');
+
+            unset($options['attach']);
+        }
+
+        # Set Loader Specific Config:
+        foreach($options as $loader => $loaderOptions) {
+
+            try{
+                $loader = $this->by($loader);
+            } catch (\Exception $e) {
+                if ($throwException)
+                    throw new \InvalidArgumentException(sprintf(
+                        'Loader (%s) not attached.'
+                        , $loader
+                    ));
+            }
+
+            if (method_exists($loader, 'with'))
+                /** @var \Poirot\Std\Interfaces\Pact\ipConfigurable $loader */
+                $loader->with($loaderOptions);
+        }
 
         return $this;
     }
@@ -114,7 +143,7 @@ trait tLoaderAggregate
      * @throws \Exception Loader class not found
      * @return iLoader
      */
-    function loader($name)
+    function by($name)
     {
         if (!$this->hasAttached($name))
             throw new \Exception(sprintf(

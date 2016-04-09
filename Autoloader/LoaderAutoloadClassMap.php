@@ -8,7 +8,8 @@ if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadClassMap', false))
 
 require_once __DIR__ . '/aLoaderAutoload.php';
 
-class LoaderAutoloadClassMap extends aLoaderAutoload
+class LoaderAutoloadClassMap
+    extends aLoaderAutoload
 {
     use tLoaderMapResource {
         tLoaderMapResource::resolve as protected __t_resolve;

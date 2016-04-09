@@ -37,15 +37,17 @@ class LoaderAutoloadNamespace extends aLoaderAutoload
      */
     function resolve($class)
     {
-        return $this->__t_resolve($class, function(&$resolvedFile) {
-            $file = $resolvedFile.'.php';
-            if (!file_exists($file))
-                return false;
+        return $this->__t_resolve($class
+            , function($resolvedFile)
+            {
+                $file = $resolvedFile.'.php';
+                if (!file_exists($file))
+                    return false;
 
-            require_once $file;
+                require_once $file;
 
-            ## stop propagation
-            return true;
-        });
+                ## stop propagation
+                return true;
+            });
     }
 }

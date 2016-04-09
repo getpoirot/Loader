@@ -19,23 +19,21 @@ class LoaderAutoloadAggregate
 {
     use tLoaderAggregate {
         tLoaderAggregate::listAttached as protected _t__listAttached;
-        tLoaderAggregate::loader       as protected _t__loader;
+        tLoaderAggregate::by           as protected _t__by;
     }
 
     protected $_aliases = [
-        'NamespaceAutoloader' => 'Poirot\Loader\Autoloader\NamespaceAutoloader',
-        'ClassMapAutoloader'  => 'Poirot\Loader\Autoloader\ClassMapAutoloader',
+        'Namespace'               => 'LoaderAutoloadNamespace',
+        'LoaderAutoloadNamespace' => \Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class,
+
+        'ClassMap'                => 'LoaderAutoloadClassMap',
+        'LoaderAutoloadClassMap'  => \Poirot\Loader\Autoloader\LoaderAutoloadClassMap::class,
     ];
 
     /**
      * Construct
      *
-     * Options:
-     * ## alias or class name
-     * ['NamespaceAutoloader' => [
-     *    'Poirot\AaResponder'  => [APP_DIR_VENDOR.'/poirot/action-responder/Poirot/AaResponder'],
-     *    'Poirot\Application'  => [APP_DIR_VENDOR.'/poirot/application/Poirot/Application'],
-     * ]]
+     *
      *
      * @param array $options
      */
@@ -45,8 +43,8 @@ class LoaderAutoloadAggregate
         $autoloader = new LoaderAutoloadNamespace(['Poirot\\Loader' => [dirname(__DIR__)]]);
         $autoloader->register(true);
 
-        if (!empty($options))
-            $this->__setupFromArray($options);
+        if ($options !== null)
+            $this->with($options);
 
         ## unregister default autoloader after attaching
         $autoloader->unregister();
@@ -58,12 +56,13 @@ class LoaderAutoloadAggregate
      * @inheritdoc
      * @return iLoader
      */
-    function loader($name)
+    function by($name)
     {
-        if (isset($this->_aliases[$name]))
+        while(isset($this->_aliases[$name]))
             $name = $this->_aliases[$name];
 
-        return $this->_t__loader($name);
+        ## resolve to loader class name by registered autoloaders
+        return $this->_t__by($name);
     }
 
     /**
@@ -75,33 +74,5 @@ class LoaderAutoloadAggregate
     function listAttached()
     {
         return array_merge(array_keys($this->_aliases), $this->_t__listAttached());
-    }
-
-    // ...
-
-    /**
-     * Setup Class With Options
-     * @param array $options
-     */
-    protected function __setupFromArray(array $options)
-    {
-        foreach($options as $loader => $loaderOptions) {
-            if (!is_string($loader) && is_string($loaderOptions)) {
-                ## ['loaderClass', ..]
-                $loader = $loaderOptions;
-                $loaderOptions = null;
-            }
-
-            if (isset($this->_aliases[$loader]))
-                ## register alias name class
-                $loader = $this->_aliases[$loader];
-
-            if ($loaderOptions)
-                $loader = new $loader($loaderOptions);
-            else
-                $loader = new $loader;
-
-            $this->attach($loader);
-        }
     }
 }

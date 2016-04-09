@@ -3,11 +3,11 @@ namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
 use Poirot\Loader\Traits\tLoaderAggregate;
-use Poirot\Std\Interfaces\Pact\ipConfigurable;
+// use Poirot\Std\Interfaces\Pact\ipConfigurable;
 
 class LoaderAggregate
     implements iLoader
-    , ipConfigurable
+//    , ipConfigurable
 {
     use tLoaderAggregate;
 

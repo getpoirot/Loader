@@ -268,7 +268,7 @@ trait tLoaderPathStack
      * @return callable
      */
     protected function _t_loader_pathstack_watch() {
-        return function(&$resolvedFile) {
+        return function($resolvedFile) {
             ## if true resolve return $resolvedFile as result
             return !file_exists($resolvedFile) ?: $resolvedFile;
         };

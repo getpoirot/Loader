@@ -8,7 +8,8 @@ if (class_exists('Poirot\\Loader\\Autoloader\\aLoaderAutoload', false))
 
 require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
-abstract class aLoaderAutoload implements iLoaderAutoload
+abstract class aLoaderAutoload
+    implements iLoaderAutoload
 {
     // Implement iLoaderAutoload:
 
