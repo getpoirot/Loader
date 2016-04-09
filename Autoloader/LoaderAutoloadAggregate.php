@@ -1,25 +1,25 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\AggregateTrait;
 use Poirot\Loader\Interfaces\iLoader;
+use Poirot\Loader\Traits\tLoaderAggregate;
 
-if (class_exists('Poirot\\Loader\\AggregateAutoloader' , false))
+if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadAggregate' , false))
     return;
 
-require_once __DIR__ . '/AbstractAutoloader.php';
-require_once __DIR__ . '/NamespaceAutoloader.php';
-require_once __DIR__ . '/../AggregateTrait.php';
+require_once __DIR__ . '/aLoaderAutoload.php';
+require_once __DIR__ . '/LoaderAutoloadNamespace.php';
+require_once __DIR__ . '/../Traits\tLoaderAggregate.php';
 
 /*
  * TODO lazy loading for attached loaders
  */
-
-class AggregateAutoloader extends AbstractAutoloader
+class LoaderAutoloadAggregate
+    extends aLoaderAutoload
 {
-    use AggregateTrait {
-        AggregateTrait::listAttached as protected _t__listAttached;
-        AggregateTrait::loader       as protected _t__loader;
+    use tLoaderAggregate {
+        tLoaderAggregate::listAttached as protected _t__listAttached;
+        tLoaderAggregate::loader       as protected _t__loader;
     }
 
     protected $_aliases = [
@@ -42,7 +42,7 @@ class AggregateAutoloader extends AbstractAutoloader
     function __construct(array $options = [])
     {
         ## register, so we can access related autoloader classes
-        $autoloader = new NamespaceAutoloader(['Poirot\\Loader' => [dirname(__DIR__)]]);
+        $autoloader = new LoaderAutoloadNamespace(['Poirot\\Loader' => [dirname(__DIR__)]]);
         $autoloader->register(true);
 
         if (!empty($options))

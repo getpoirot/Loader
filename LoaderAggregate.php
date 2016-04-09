@@ -2,10 +2,14 @@
 namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
+use Poirot\Loader\Traits\tLoaderAggregate;
+use Poirot\Std\Interfaces\Pact\ipConfigurable;
 
-class AggregateLoader implements iLoader
+class LoaderAggregate
+    implements iLoader
+    , ipConfigurable
 {
-    use AggregateTrait;
+    use tLoaderAggregate;
 
     /**
      * Construct
@@ -15,6 +19,6 @@ class AggregateLoader implements iLoader
     function __construct(array $options = null)
     {
         if ($options !== null)
-            $this->from($options);
+            $this->with($options);
     }
 }

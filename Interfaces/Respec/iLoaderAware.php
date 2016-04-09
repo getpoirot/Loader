@@ -1,7 +1,9 @@
 <?php
-namespace Poirot\Loader\Interfaces;
+namespace Poirot\Loader\Interfaces\Respec;
 
-interface iLoaderAware 
+use Poirot\Loader\Interfaces\iLoader;
+
+interface iLoaderAware
 {
     /**
      * Set Loader Resolver

@@ -1,16 +1,16 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\Interfaces\iSplAutoloader;
+use Poirot\Loader\Interfaces\iLoaderAutoload;
 
-if (class_exists('Poirot\\Loader\\Autoloader\\AbstractAutoloader' , false))
+if (class_exists('Poirot\\Loader\\Autoloader\\aLoaderAutoload', false))
     return;
 
-require_once __DIR__ . '/../Interfaces/iSplAutoloader.php';
+require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
-abstract class AbstractAutoloader implements iSplAutoloader
+abstract class aLoaderAutoload implements iLoaderAutoload
 {
-    // Implement iSplAutoloader:
+    // Implement iLoaderAutoload:
 
     /**
      * Autoload Class Callable
@@ -51,4 +51,3 @@ abstract class AbstractAutoloader implements iSplAutoloader
         spl_autoload_unregister([$this, 'resolve']);
     }
 }
- 

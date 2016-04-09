@@ -1,18 +1,18 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\PathStackTrait;
+use Poirot\Loader\Traits\tLoaderPathStack;
 
-if (class_exists('Poirot\\Loader\\Autoloader\\NamespaceAutoloader' , false))
+if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadNamespace', false))
     return;
 
-require_once __DIR__ . '/AbstractAutoloader.php';
-require_once __DIR__ . '/../PathStackTrait.php';
+require_once __DIR__ . '/aLoaderAutoload.php';
+require_once __DIR__ . '/../Traits/tLoaderPathStack.php';
 
-class NamespaceAutoloader extends AbstractAutoloader
+class LoaderAutoloadNamespace extends aLoaderAutoload
 {
-    use PathStackTrait {
-        PathStackTrait::resolve as protected __t_resolve;
+    use tLoaderPathStack {
+        tLoaderPathStack::resolve as protected __t_resolve;
     }
 
     /**
@@ -23,7 +23,7 @@ class NamespaceAutoloader extends AbstractAutoloader
     function __construct($namespaces = null)
     {
         if ($namespaces !== null)
-            $this->from($namespaces);
+            $this->with(self::withOf($namespaces));
     }
 
     /**

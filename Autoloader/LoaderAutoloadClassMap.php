@@ -1,17 +1,17 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\ResourceMapTrait;
+use Poirot\Loader\Traits\tLoaderMapResource;
 
-if (class_exists('Poirot\\Loader\\Autoloader\\ClassMapAutoloader' , false))
+if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadClassMap', false))
     return;
 
-require_once __DIR__ . '/AbstractAutoloader.php';
+require_once __DIR__ . '/aLoaderAutoload.php';
 
-class ClassMapAutoloader extends AbstractAutoloader
+class LoaderAutoloadClassMap extends aLoaderAutoload
 {
-    use ResourceMapTrait {
-        ResourceMapTrait::resolve as protected __t_resolve;
+    use tLoaderMapResource {
+        tLoaderMapResource::resolve as protected __t_resolve;
     }
 
     /**
@@ -22,7 +22,7 @@ class ClassMapAutoloader extends AbstractAutoloader
     function __construct($options = null)
     {
         if ($options !== null)
-            $this->from($options);
+            $this->with(self::withOf($options));
     }
 
     /**

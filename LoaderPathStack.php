@@ -2,14 +2,14 @@
 namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
+use Poirot\Loader\Traits\tLoaderPathStack;
+use Poirot\Std\Interfaces\Pact\ipConfigurable;
 
-/**
- * TODO default watch resolver as option setter
- */
-
-class PathStackResolver implements iLoader
+class LoaderPathStack
+    implements iLoader
+    , ipConfigurable
 {
-    use PathStackTrait;
+    use tLoaderPathStack;
 
     /**
      * Construct
@@ -19,7 +19,6 @@ class PathStackResolver implements iLoader
     function __construct(array $namespaces = [])
     {
         if ($namespaces)
-            $this->fromArray($namespaces);
+            $this->with($namespaces);
     }
 }
- 

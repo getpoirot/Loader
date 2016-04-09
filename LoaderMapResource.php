@@ -2,10 +2,14 @@
 namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
+use Poirot\Loader\Traits\tLoaderMapResource;
+use Poirot\Std\Interfaces\Pact\ipConfigurable;
 
-class ResourceMapResolver implements iLoader
+class LoaderMapResource
+    implements iLoader
+    , ipConfigurable
 {
-    use ResourceMapTrait;
+    use tLoaderMapResource;
 
     /**
      * Construct
@@ -15,7 +19,6 @@ class ResourceMapResolver implements iLoader
     function __construct($options = null)
     {
         if ($options !== null)
-            $this->from($options);
+            $this->with($options);
     }
 }
- 

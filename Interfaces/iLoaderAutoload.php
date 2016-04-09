@@ -1,12 +1,13 @@
 <?php
 namespace Poirot\Loader\Interfaces;
 
-if (interface_exists('Poirot\\Loader\\Interfaces\\iSplAutoloader',false))
+if (interface_exists('Poirot\\Loader\\Interfaces\\iLoaderAutoload',false))
     return;
 
-require_once 'iLoader.php';
+require_once __DIR__.'/iLoader.php';
 
-interface iSplAutoloader extends iLoader
+interface   iLoaderAutoload
+    extends iLoader
 {
     /**
      * Register to spl autoloader
