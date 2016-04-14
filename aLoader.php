@@ -36,7 +36,7 @@ abstract class aLoader
      *   [code]
      *
      *
-     * @param array|mixed $optionsRes
+     * @param array|string $optionsRes Array Options Or Path To Array Included File
      *
      * @throws \InvalidArgumentException if resource not supported
      * @return array

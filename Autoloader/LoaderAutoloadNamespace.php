@@ -27,18 +27,16 @@ class LoaderAutoloadNamespace
      */
     function resolve($class)
     {
-        return parent::resolve($class
-            , function($resolvedFile)
-            {
-                $file = $resolvedFile.'.php';
-                if (!file_exists($file))
-                    return false;
+        return parent::resolve($class, function($resolvedFile) {
+            $file = $resolvedFile.'.php';
+            if (!file_exists($file))
+                return false;
 
-                require_once $file;
+            require_once $file;
 
-                ## stop propagation
-                return true;
-            });
+            ## stop propagation
+            return $file;
+        });
     }
 
     // Implement iLoaderAutoload:

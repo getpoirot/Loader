@@ -81,32 +81,32 @@ class LoaderNamespaceStack
      *    return true;
      * }
      *
-     * @param string   $resource
+     * @param string   $resourceName
      * @param \Closure $watch
      *
      * @return false|array|mixed
      */
-    function resolve($resource, \Closure $watch = null)
+    function resolve($resourceName, \Closure $watch = null)
     {
-        $resource = (string) $resource;
-        if ($resource === '' || empty($this->_t_loader_namespacestack_Namespaces))
+        $resourceName = (string) $resourceName;
+        if ($resourceName === '' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
-        if (isset($this->_t_loader_namespacestack_Namespaces[$resource])) {
+        if (isset($this->_t_loader_namespacestack_Namespaces[$resourceName])) {
             ## whole resource match exists in stack and resolved
-            foreach($this->_t_loader_namespacestack_Namespaces[$resource] as $resolved) {
+            foreach($this->_t_loader_namespacestack_Namespaces[$resourceName] as $resolved) {
                 if ($return = $this->_t_loader_namespacestack_watchResolve($resolved, $watch))
                     return $return;
             }
         }
 
         foreach($this->_t_loader_namespacestack_cache_Matched as $namespace)
-            if (strpos($resource, $namespace) === 0) {
-                if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resource, $namespace, $watch))
+            if (strpos($resourceName, $namespace) === 0) {
+                if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resourceName, $namespace, $watch))
                     return $return;
             }
 
-        $matched = $this->_t_loader_namespacestack_getMatchedFromStack($resource);
+        $matched = $this->_t_loader_namespacestack_getMatchedFromStack($resourceName);
         $this->_t_loader_namespacestack_cache_Matched = array_merge($matched, $this->_t_loader_namespacestack_cache_Matched);
 
         // push wildcard star '*' namespace to matched if exists
@@ -116,7 +116,7 @@ class LoaderNamespaceStack
 
         // search for class library file:
         foreach($matched as $namespace) {
-            if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resource, $namespace, $watch))
+            if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resourceName, $namespace, $watch))
                 return $return;
         }
 

@@ -3,6 +3,8 @@ namespace Poirot\Loader\Traits;
 
 use Closure;
 
+// TODO add separator
+
 trait tLoaderNamespaceStack
 {
     ## @see fixes/LoaderNamespaceStack;

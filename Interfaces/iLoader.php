@@ -6,9 +6,9 @@ interface iLoader
     /**
      * Resolve To Resource
      *
-     * @param mixed $resource
+     * @param string $resourceName
      *
-     * @return mixed
+     * @return mixed Resolved Resource Or Anything
      */
-    function resolve($resource);
+    function resolve($resourceName);
 }

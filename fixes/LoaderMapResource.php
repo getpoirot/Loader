@@ -64,17 +64,17 @@ class LoaderMapResource
     /**
      * Resolve To Resource By Map
      *
-     * @param string $resource
+     * @param string $resourceName
      *
      * @return false|mixed
      */
-    function resolve($resource)
+    function resolve($resourceName)
     {
-        $resource = (string) $resource;
-        if (!array_key_exists($resource, $this->_t_loader_map_resource_MapRes))
+        $resourceName = (string) $resourceName;
+        if (!array_key_exists($resourceName, $this->_t_loader_map_resource_MapRes))
             return false;
 
-        return $this->_t_loader_map_resource_MapRes[$resource];
+        return $this->_t_loader_map_resource_MapRes[$resourceName];
     }
     ## Code Clone <end> ===================================================================
 
