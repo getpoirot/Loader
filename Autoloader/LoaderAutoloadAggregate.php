@@ -44,8 +44,8 @@ class LoaderAutoloadAggregate
         // examine we have not autoloading yet!!
         // so we register default autoloader classmap and namespace
         // and can configured with class name as option key member
-        $this->attach(new LoaderAutoloadNamespace());
-        $this->attach(new LoaderAutoloadClassMap());
+        $this->attach(new LoaderAutoloadNamespace(), 100); // at priority 100
+        $this->attach(new LoaderAutoloadClassMap() , 100);
 
         parent::__construct($options);
 
