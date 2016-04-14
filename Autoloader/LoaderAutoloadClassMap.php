@@ -4,11 +4,13 @@ namespace Poirot\Loader\Autoloader;
 if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadClassMap', false))
     return;
 
+!class_exists('Poirot\Loader\LoaderMapResource', false)
+    and require_once __DIR__.'/../LoaderMapResource.php';
+!interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false)
+    and require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
+
 use Poirot\Loader\Interfaces\iLoaderAutoload;
 use Poirot\Loader\LoaderMapResource;
-
-require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
-require_once __DIR__ . '/../LoaderMapResource.php';
 
 class LoaderAutoloadClassMap
     extends LoaderMapResource

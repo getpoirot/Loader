@@ -7,7 +7,7 @@ use Poirot\Loader\Interfaces\iLoader;
 
 trait tLoaderAggregate
 {
-    ## @see fix/LoaderAggregate;
+    ## @see fixes/LoaderAggregate;
     ## Code Clone <begin> =================================================================
     /** @var SplPriorityQueue */
     protected $_t_loader_aggregate_Queue;

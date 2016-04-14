@@ -1,11 +1,10 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-if (class_exists('Poirot\Loader\Autoloader\aLoaderAutoload', false))
-    return;
-
-require_once __DIR__ . '/../aLoader.php';
-require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
+!class_exists('Poirot/Loader/aLoader', false)
+    and require_once __DIR__.'/../aLoader.php';
+!interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false)
+    and require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
 use Poirot\Loader\aLoader;
 use Poirot\Loader\Interfaces\iLoaderAutoload;

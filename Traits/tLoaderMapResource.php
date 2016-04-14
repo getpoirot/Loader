@@ -3,6 +3,8 @@ namespace Poirot\Loader\Traits;
 
 trait tLoaderMapResource
 {
+    ## @see fixes/LoaderMapResource
+    ## Code Clone <begin> =================================================================
     /**
      * @var array Registered Resource Maps
      */
@@ -60,4 +62,5 @@ trait tLoaderMapResource
 
         return $this->_t_loader_map_resource_MapRes[$resource];
     }
+    ## Code Clone <end> ===================================================================
 }

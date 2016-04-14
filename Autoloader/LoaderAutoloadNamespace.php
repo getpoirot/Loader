@@ -4,11 +4,13 @@ namespace Poirot\Loader\Autoloader;
 if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadNamespace', false))
     return;
 
+!class_exists('Poirot\Loader\LoaderNamespaceStack', false)
+    and require_once __DIR__.'/../LoaderNamespaceStack.php';
+!interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false)
+    and require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
+
 use Poirot\Loader\Interfaces\iLoaderAutoload;
 use Poirot\Loader\LoaderNamespaceStack;
-
-require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
-require_once __DIR__ . '/../LoaderNamespaceStack.php';
 
 class LoaderAutoloadNamespace
     extends LoaderNamespaceStack

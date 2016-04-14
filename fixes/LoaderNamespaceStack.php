@@ -6,6 +6,9 @@
 
 namespace Poirot\Loader;
 
+!class_exists('Poirot/Loader/aLoader', false)
+    and require_once __DIR__.'/../aLoader.php';
+
 class LoaderNamespaceStack
     extends aLoader
 {
@@ -279,9 +282,10 @@ class LoaderNamespaceStack
 
         return '/'. $this->_t_loader_namespacestack_normalizeDir($maskOffClass);
     }
-
     ## Code Clone <end> ===================================================================
 
+    ## @see ../LoaderNamespaceStack;
+    ## Code Clone <begin> =================================================================
     /**
      * Build Object With Provided Options
      * > Setup Aggregate Loader
@@ -297,4 +301,5 @@ class LoaderNamespaceStack
         $this->setResources($options);
         return $this;
     }
+    ## Code Clone <end> ===================================================================
 }

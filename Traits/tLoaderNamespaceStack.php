@@ -1,8 +1,12 @@
 <?php
 namespace Poirot\Loader\Traits;
 
+use Closure;
+
 trait tLoaderNamespaceStack
 {
+    ## @see fixes/LoaderNamespaceStack;
+    ## Code Clone <begin> =================================================================
     /**
      * @var array Registered Namespaces
      */
@@ -66,11 +70,11 @@ trait tLoaderNamespaceStack
      * }
      *
      * @param string   $resource
-     * @param \Closure $watch
+     * @param Closure $watch
      *
      * @return false|array|mixed
      */
-    function resolve($resource, \Closure $watch = null)
+    function resolve($resource, Closure $watch = null)
     {
         $resource = (string) $resource;
         if ($resource === '' || empty($this->_t_loader_namespacestack_Namespaces))

@@ -1,16 +1,17 @@
 <?php
 namespace Poirot\Loader;
 
-require_once __DIR__.'/aLoader.php';
-
 if (version_compare(phpversion(), '5.4.0') < 0) {
     ## php version not support traits
     require_once __DIR__.'/fixes/LoaderAggregate.php';
     return;
 }
 
+!class_exists('Poirot/Loader/aLoader', false)
+    and require_once __DIR__.'/aLoader.php';
+!trait_exists('Poirot\Loader\Traits\tLoaderAggregate', false)
+    and require_once __DIR__.'/Traits/tLoaderAggregate.php';
 
-require_once __DIR__.'/Traits/tLoaderAggregate.php';
 use Poirot\Loader\Traits\tLoaderAggregate;
 
 class LoaderAggregate

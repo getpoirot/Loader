@@ -1,10 +1,8 @@
 <?php
 namespace Poirot\Loader\Interfaces;
 
-if (interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false))
-    return;
-
-require_once __DIR__.'/iLoader.php';
+!interface_exists('Poirot\Loader\Interfaces\iLoader', false)
+    and require_once __DIR__.'/iLoader.php';
 
 interface   iLoaderAutoload
     extends iLoader

@@ -4,11 +4,13 @@ namespace Poirot\Loader\Autoloader;
 if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadAggregate', false))
     return;
 
+!class_exists('Poirot\Loader\LoaderAggregate', false)
+    and require_once __DIR__.'/../LoaderAggregate.php';
+!interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false)
+    and require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
+
 use Poirot\Loader\LoaderAggregate;
 use Poirot\Loader\Interfaces\iLoaderAutoload;
-
-require_once __DIR__ . '/../LoaderAggregate.php';
-require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
 /*
 require_once __DIR__.'/Loader/Autoloader/LoaderAutoloadAggregate.php';
@@ -24,7 +26,6 @@ $loader->register();
 
 new P\Std\ErrorStack(); // autoload class
 */
-
 class LoaderAutoloadAggregate
     extends LoaderAggregate
     implements iLoaderAutoload

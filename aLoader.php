@@ -1,10 +1,8 @@
 <?php
 namespace Poirot\Loader;
 
-if (class_exists('Poirot\Loader\aLoader', false))
-    return;
-
-require_once __DIR__.'/Interfaces/iLoader.php';
+!interface_exists('Poirot\Loader\Interfaces\iLoader', false)
+    and require_once __DIR__.'/Interfaces/iLoader.php';
 
 use Poirot\Loader\Interfaces\iLoader;
 

@@ -8,6 +8,9 @@ namespace Poirot\Loader;
 
 use SplPriorityQueue;
 
+!class_exists('Poirot/Loader/aLoader', false)
+    and require_once __DIR__.'/../aLoader.php';
+
 use Poirot\Loader\Interfaces\iLoader;
 
 class LoaderAggregate
@@ -133,7 +136,7 @@ class LoaderAggregate
     ## Code Clone <end> ===================================================================
 
 
-    ## @see LoaderAggregate;
+    ## @see ../LoaderAggregate;
     ## Code Clone <begin> =================================================================
     /**
      * Build Object With Provided Options

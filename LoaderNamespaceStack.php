@@ -1,16 +1,17 @@
 <?php
 namespace Poirot\Loader;
 
-require_once __DIR__.'/aLoader.php';
-
 if (version_compare(phpversion(), '5.4.0') < 0) {
     ## php version not support traits
     require_once __DIR__.'/fixes/LoaderNamespaceStack.php';
     return;
 }
 
+!class_exists('Poirot/Loader/aLoader', false)
+    and require_once __DIR__.'/aLoader.php';
+!trait_exists('Poirot\Loader\Traits\tLoaderNamespaceStack', false)
+    and require_once __DIR__.'/Traits/tLoaderNamespaceStack.php';
 
-require_once __DIR__.'/Traits/tLoaderNamespaceStack.php';
 use Poirot\Loader\Traits\tLoaderNamespaceStack;
 
 class LoaderNamespaceStack
@@ -18,6 +19,8 @@ class LoaderNamespaceStack
 {
     use tLoaderNamespaceStack;
 
+    ## @see fixes/LoaderNamespaceStack;
+    ## Code Clone <begin> =================================================================
     /**
      * Build Object With Provided Options
      * > Setup Aggregate Loader
@@ -33,4 +36,5 @@ class LoaderNamespaceStack
         $this->setResources($options);
         return $this;
     }
+    ## Code Clone <end> ===================================================================
 }
