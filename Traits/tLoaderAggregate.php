@@ -7,9 +7,9 @@ use Poirot\Loader\Interfaces\iLoader;
 
 trait tLoaderAggregate
 {
-    /**
-     * @var SplPriorityQueue
-     */
+    ## @see fix/LoaderAggregate;
+    ## Code Clone <begin> =================================================================
+    /** @var SplPriorityQueue */
     protected $_t_loader_aggregate_Queue;
 
     protected $_t_loader_aggregate_Names = array(
@@ -30,7 +30,7 @@ trait tLoaderAggregate
         $resolve = false;
         /** @var iLoader $loader */
         foreach(clone $this->_t_loader_aggregate_getQueue() as $loader) {
-            $resolve = call_user_func_array([$loader, 'resolve'], func_get_args());
+            $resolve = call_user_func_array(array($loader, 'resolve'), func_get_args());
             if ($resolve)
                 break;
         }
@@ -41,8 +41,10 @@ trait tLoaderAggregate
     /**
      * Attach (insert) Loader
      *
-     * @param iLoader $loader
-     * @param int     $priority
+     * - it will store loader can retrieved by ClassName
+     *
+     * @param iLoader     $loader
+     * @param int         $priority
      *
      * @return $this
      */
@@ -58,6 +60,11 @@ trait tLoaderAggregate
 
     /**
      * Get Loader By Name
+     *
+     * [code:]
+     *  $aggregateLoader->by(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
+     *     ->with([..options])
+     * [code]
      *
      * @param string $name Loader Name, default is class name
      *
@@ -78,6 +85,10 @@ trait tLoaderAggregate
     /**
      * Has Loader With This Name Attached?
      *
+     * [code:]
+     *  $aggregateLoader->hasAttached(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
+     * [code]
+     *
      * @param string $name Loader Name, default is class name
      *
      * @return bool
@@ -90,7 +101,7 @@ trait tLoaderAggregate
     /**
      * Get Attached loader List
      *
-     * @return array Associate Array Of Name
+     * @return array Array Of Names
      */
     function listAttached()
     {
@@ -108,4 +119,5 @@ trait tLoaderAggregate
 
         return $this->_t_loader_aggregate_Queue;
     }
+    ## Code Clone <end> ===================================================================
 }

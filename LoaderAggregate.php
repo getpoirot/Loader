@@ -18,15 +18,16 @@ class LoaderAggregate
 {
     use tLoaderAggregate;
 
-
+    ## @see fixes/LoaderAggregate;
+    ## Code Clone <begin> =================================================================
     /**
      * Build Object With Provided Options
      * > Setup Aggregate Loader
      *   Options:
      *  [
-     *    'attach' => [0 => iLoader, $priority => iLoader],
+     *    'attach' => [0 => iLoader, $priority => iLoader, ['loader' => iLoader, 'priority' => $pr] ],
      *    'Registered\ClassLoader' => [
-    // Options
+     *       // Options
      *       'Poirot\AaResponder'  => [APP_DIR_VENDOR.'/poirot/action-responder/Poirot/AaResponder'],
      *       'Poirot\Application'  => [APP_DIR_VENDOR.'/poirot/application/Poirot/Application'],
      *    ]
@@ -46,8 +47,20 @@ class LoaderAggregate
             if(!is_array($attach))
                 $attach = [$attach];
 
-            foreach($attach as $pr => $loader)
+            foreach($attach as $pr => $loader) {
+                if (is_array($loader)) {
+                    if (!isset($loader['priority']) || !isset($loader['loader']))
+                        throw new \InvalidArgumentException(sprintf(
+                            'Invalid Option Provided (%s).'
+                            , \Poirot\Std\flatten($loader)
+                        ));
+
+                    $pr     = $loader['priority'];
+                    $loader = $loader['loader'];
+                }
+
                 $this->attach($loader, $pr);
+            }
 
             unset($options['attach']);
         }
@@ -72,4 +85,5 @@ class LoaderAggregate
 
         return $this;
     }
+    ## Code Clone <end> ===================================================================
 }

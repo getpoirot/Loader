@@ -20,9 +20,7 @@ class LoaderAggregate
 
     ## @see tLoaderAggregate;
     ## Code Clone <begin> =================================================================
-    /**
-     * @var SplPriorityQueue
-     */
+    /** @var SplPriorityQueue */
     protected $_t_loader_aggregate_Queue;
 
     protected $_t_loader_aggregate_Names = array(
@@ -42,8 +40,8 @@ class LoaderAggregate
     {
         $resolve = false;
         /** @var iLoader $loader */
-        foreach(clone $this->_t_loader_aggregate_getQueue() as $loader) {
-            $resolve = call_user_func_array([$loader, 'resolve'], func_get_args());
+        foreach (clone $this->_t_loader_aggregate_getQueue() as $loader) {
+            $resolve = call_user_func_array(array($loader, 'resolve'), func_get_args());
             if ($resolve)
                 break;
         }
@@ -54,8 +52,10 @@ class LoaderAggregate
     /**
      * Attach (insert) Loader
      *
+     * - it will store loader can retrieved by ClassName
+     *
      * @param iLoader $loader
-     * @param int     $priority
+     * @param int $priority
      *
      * @return $this
      */
@@ -71,6 +71,11 @@ class LoaderAggregate
 
     /**
      * Get Loader By Name
+     *
+     * [code:]
+     *  $aggregateLoader->by(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
+     *     ->with([..options])
+     * [code]
      *
      * @param string $name Loader Name, default is class name
      *
@@ -91,6 +96,10 @@ class LoaderAggregate
     /**
      * Has Loader With This Name Attached?
      *
+     * [code:]
+     *  $aggregateLoader->hasAttached(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
+     * [code]
+     *
      * @param string $name Loader Name, default is class name
      *
      * @return bool
@@ -103,7 +112,7 @@ class LoaderAggregate
     /**
      * Get Attached loader List
      *
-     * @return array Associate Array Of Name
+     * @return array Array Of Names
      */
     function listAttached()
     {
@@ -124,14 +133,16 @@ class LoaderAggregate
     ## Code Clone <end> ===================================================================
 
 
+    ## @see LoaderAggregate;
+    ## Code Clone <begin> =================================================================
     /**
      * Build Object With Provided Options
      * > Setup Aggregate Loader
      *   Options:
      *  [
-     *    'attach' => [0 => iLoader, $priority => iLoader],
+     *    'attach' => [0 => iLoader, $priority => iLoader, ['loader' => iLoader, 'priority' => $pr] ],
      *    'Registered\ClassLoader' => [
-    // Options
+     *       // Options
      *       'Poirot\AaResponder'  => [APP_DIR_VENDOR.'/poirot/action-responder/Poirot/AaResponder'],
      *       'Poirot\Application'  => [APP_DIR_VENDOR.'/poirot/application/Poirot/Application'],
      *    ]
@@ -151,8 +162,20 @@ class LoaderAggregate
             if(!is_array($attach))
                 $attach = [$attach];
 
-            foreach($attach as $pr => $loader)
+            foreach($attach as $pr => $loader) {
+                if (is_array($loader)) {
+                    if (!isset($loader['priority']) || !isset($loader['loader']))
+                        throw new \InvalidArgumentException(sprintf(
+                            'Invalid Option Provided (%s).'
+                            , \Poirot\Std\flatten($loader)
+                        ));
+
+                    $pr     = $loader['priority'];
+                    $loader = $loader['loader'];
+                }
+
                 $this->attach($loader, $pr);
+            }
 
             unset($options['attach']);
         }
@@ -177,4 +200,5 @@ class LoaderAggregate
 
         return $this;
     }
+    ## Code Clone <end> ===================================================================
 }

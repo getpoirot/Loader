@@ -5,29 +5,30 @@ if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadAggregate', false))
     return;
 
 use Poirot\Loader\LoaderAggregate;
-use Poirot\Loader\Interfaces\iLoader;
 use Poirot\Loader\Interfaces\iLoaderAutoload;
 
 require_once __DIR__ . '/../LoaderAggregate.php';
 require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
 /*
- * TODO lazy loading for attached loaders
- */
+require_once __DIR__.'/Loader/Autoloader/LoaderAutoloadAggregate.php';
+$loader = new P\Loader\Autoloader\LoaderAutoloadAggregate([
+    // examine we have not autoloading yet!!
+    // so we register default autoloader classmap and namespace
+    // and can configured with class name
+    P\Loader\Autoloader\LoaderAutoloadClassMap::class => [
+        'Poirot\Std\ErrorStack' => __DIR__.'/Std/ErrorStack.php'
+    ]
+]);
+$loader->register();
+
+new P\Std\ErrorStack(); // autoload class
+*/
+
 class LoaderAutoloadAggregate
     extends LoaderAggregate
     implements iLoaderAutoload
 {
-    protected $_aliases = array(
-        'Namespace'               => 'LoaderAutoloadNamespace',
-        'LoaderAutoloadNamespace' => '\Poirot\Loader\Autoloader\LoaderAutoloadNamespace',
-//        'LoaderAutoloadNamespace' => \Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class,
-
-        'ClassMap'                => 'LoaderAutoloadClassMap',
-        'LoaderAutoloadClassMap'  => '\Poirot\Loader\Autoloader\LoaderAutoloadClassMap',
-//        'LoaderAutoloadClassMap'  => \Poirot\Loader\Autoloader\LoaderAutoloadClassMap::class,
-    );
-
     /**
      * Construct
      *
@@ -36,39 +37,20 @@ class LoaderAutoloadAggregate
     function __construct(array $options = null)
     {
         ## register, so we can access related autoloader classes
+        require_once __DIR__.'/LoaderAutoloadNamespace.php';
         $autoloader = new LoaderAutoloadNamespace( array('Poirot\Loader' => array(dirname(__DIR__))) );
         $autoloader->register(true);
+
+        // examine we have not autoloading yet!!
+        // so we register default autoloader classmap and namespace
+        // and can configured with class name as option key member
+        $this->attach(new LoaderAutoloadNamespace());
+        $this->attach(new LoaderAutoloadClassMap());
 
         parent::__construct($options);
 
         ## unregister default autoloader after attaching
         $autoloader->unregister();
-    }
-
-    /**
-     * @override get by aliased
-     *
-     * @inheritdoc
-     * @return iLoader
-     */
-    function by($name)
-    {
-        while(isset($this->_aliases[$name]))
-            $name = $this->_aliases[$name];
-
-        ## resolve to loader class name by registered autoloaders
-        return parent::by($name);
-    }
-
-    /**
-     * @override list aliased
-     *
-     * @inheritdoc
-     * @return array Associate Array Of Name
-     */
-    function listAttached()
-    {
-        return array_merge(array_keys($this->_aliases), parent::listAttached());
     }
 
     // Implement iLoaderAutoload:
