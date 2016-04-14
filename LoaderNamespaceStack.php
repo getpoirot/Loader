@@ -5,19 +5,18 @@ require_once __DIR__.'/aLoader.php';
 
 if (version_compare(phpversion(), '5.4.0') < 0) {
     ## php version not support traits
-    require_once __DIR__.'/fixes/LoaderMapResource.php';
+    require_once __DIR__.'/fixes/LoaderNamespaceStack.php';
     return;
 }
 
 
-require_once __DIR__.'/Traits/tLoaderMapResource.php';
-use Poirot\Loader\Traits\tLoaderMapResource;
+require_once __DIR__.'/Traits/tLoaderNamespaceStack.php';
+use Poirot\Loader\Traits\tLoaderNamespaceStack;
 
-class LoaderMapResource
+class LoaderNamespaceStack
     extends aLoader
 {
-    use tLoaderMapResource;
-
+    use tLoaderNamespaceStack;
 
     /**
      * Build Object With Provided Options

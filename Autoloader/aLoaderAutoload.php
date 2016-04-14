@@ -1,14 +1,17 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\Interfaces\iLoaderAutoload;
-
-if (class_exists('Poirot\\Loader\\Autoloader\\aLoaderAutoload', false))
+if (class_exists('Poirot\Loader\Autoloader\aLoaderAutoload', false))
     return;
 
+require_once __DIR__ . '/../aLoader.php';
 require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
+use Poirot\Loader\aLoader;
+use Poirot\Loader\Interfaces\iLoaderAutoload;
+
 abstract class aLoaderAutoload
+    extends aLoader
     implements iLoaderAutoload
 {
     // Implement iLoaderAutoload:
@@ -37,7 +40,7 @@ abstract class aLoaderAutoload
      */
     function register($prepend = false)
     {
-        spl_autoload_register([$this, 'resolve'], true, $prepend);
+        spl_autoload_register(array($this, 'resolve'), true, $prepend);
     }
 
     /**
@@ -49,6 +52,6 @@ abstract class aLoaderAutoload
      */
     function unregister()
     {
-        spl_autoload_unregister([$this, 'resolve']);
+        spl_autoload_unregister(array($this, 'resolve'));
     }
 }

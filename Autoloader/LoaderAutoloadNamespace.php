@@ -1,31 +1,19 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\Traits\tLoaderPathStack;
-
-if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadNamespace', false))
+if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadNamespace', false))
     return;
 
-require_once __DIR__ . '/aLoaderAutoload.php';
-require_once __DIR__ . '/../Traits/tLoaderPathStack.php';
+use Poirot\Loader\Interfaces\iLoaderAutoload;
+use Poirot\Loader\LoaderNamespaceStack;
 
-class LoaderAutoloadNamespace extends aLoaderAutoload
+require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
+require_once __DIR__ . '/../LoaderNamespaceStack.php';
+
+class LoaderAutoloadNamespace
+    extends LoaderNamespaceStack
+    implements iLoaderAutoload
 {
-    use tLoaderPathStack {
-        tLoaderPathStack::resolve as protected __t_resolve;
-    }
-
-    /**
-     * Construct
-     *
-     * @param array $namespaces
-     */
-    function __construct($namespaces = null)
-    {
-        if ($namespaces !== null)
-            $this->with(self::withOf($namespaces));
-    }
-
     /**
      * Autoload Class
      *
@@ -37,7 +25,7 @@ class LoaderAutoloadNamespace extends aLoaderAutoload
      */
     function resolve($class)
     {
-        return $this->__t_resolve($class
+        return parent::resolve($class
             , function($resolvedFile)
             {
                 $file = $resolvedFile.'.php';
@@ -49,5 +37,35 @@ class LoaderAutoloadNamespace extends aLoaderAutoload
                 ## stop propagation
                 return true;
             });
+    }
+
+    // Implement iLoaderAutoload:
+
+    /**
+     * Register to spl autoloader
+     *
+     * <code>
+     * spl_autoload_register(callable);
+     * </code>
+     *
+     * @param bool $prepend
+     *
+     * @return void
+     */
+    function register($prepend = false)
+    {
+        spl_autoload_register(array($this, 'resolve'), true, $prepend);
+    }
+
+    /**
+     * Unregister from spl autoloader
+     *
+     * ! using same callable on register
+     *
+     * @return void
+     */
+    function unregister()
+    {
+        spl_autoload_unregister(array($this, 'resolve'));
     }
 }

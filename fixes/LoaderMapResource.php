@@ -1,8 +1,21 @@
 <?php
-namespace Poirot\Loader\Traits;
+## ===================================================
+## | This fix is Code Clone of LoaderMapResource
+## | it will resolve when php not support Traits
+## | @see LoaderMapResource
 
-trait tLoaderMapResource
+namespace Poirot\Loader;
+
+class LoaderMapResource
+    extends aLoader
 {
+    ## just determine that fixed class loaded in debugs
+    protected $IS_FIX;
+
+    // use tLoaderMapResource;
+
+    ## @see tLoaderNamespaceStack;
+    ## Code Clone <begin> =================================================================
     /**
      * @var array Registered Resource Maps
      */
@@ -59,5 +72,23 @@ trait tLoaderMapResource
             return false;
 
         return $this->_t_loader_map_resource_MapRes[$resource];
+    }
+    ## Code Clone <end> ===================================================================
+
+
+    /**
+     * Build Object With Provided Options
+     * > Setup Aggregate Loader
+     *
+     * @param array $options Associated Array
+     * @param bool $throwException Throw Exception On Wrong Option
+     *
+     * @throws \Exception
+     * @return $this
+     */
+    function with(array $options, $throwException = false)
+    {
+        $this->setResources($options);
+        return $this;
     }
 }

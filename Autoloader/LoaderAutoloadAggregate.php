@@ -1,50 +1,45 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\Interfaces\iLoader;
-use Poirot\Loader\Traits\tLoaderAggregate;
-
-if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadAggregate' , false))
+if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadAggregate', false))
     return;
 
-require_once __DIR__ . '/aLoaderAutoload.php';
-require_once __DIR__ . '/LoaderAutoloadNamespace.php';
-require_once __DIR__ . '/../Traits\tLoaderAggregate.php';
+use Poirot\Loader\LoaderAggregate;
+use Poirot\Loader\Interfaces\iLoader;
+use Poirot\Loader\Interfaces\iLoaderAutoload;
+
+require_once __DIR__ . '/../LoaderAggregate.php';
+require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
 /*
  * TODO lazy loading for attached loaders
  */
 class LoaderAutoloadAggregate
-    extends aLoaderAutoload
+    extends LoaderAggregate
+    implements iLoaderAutoload
 {
-    use tLoaderAggregate {
-        tLoaderAggregate::listAttached as protected _t__listAttached;
-        tLoaderAggregate::by           as protected _t__by;
-    }
-
-    protected $_aliases = [
+    protected $_aliases = array(
         'Namespace'               => 'LoaderAutoloadNamespace',
-        'LoaderAutoloadNamespace' => \Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class,
+        'LoaderAutoloadNamespace' => '\Poirot\Loader\Autoloader\LoaderAutoloadNamespace',
+//        'LoaderAutoloadNamespace' => \Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class,
 
         'ClassMap'                => 'LoaderAutoloadClassMap',
-        'LoaderAutoloadClassMap'  => \Poirot\Loader\Autoloader\LoaderAutoloadClassMap::class,
-    ];
+        'LoaderAutoloadClassMap'  => '\Poirot\Loader\Autoloader\LoaderAutoloadClassMap',
+//        'LoaderAutoloadClassMap'  => \Poirot\Loader\Autoloader\LoaderAutoloadClassMap::class,
+    );
 
     /**
      * Construct
      *
-     *
-     *
      * @param array $options
      */
-    function __construct(array $options = [])
+    function __construct(array $options = null)
     {
         ## register, so we can access related autoloader classes
-        $autoloader = new LoaderAutoloadNamespace(['Poirot\\Loader' => [dirname(__DIR__)]]);
+        $autoloader = new LoaderAutoloadNamespace( array('Poirot\Loader' => array(dirname(__DIR__))) );
         $autoloader->register(true);
 
-        if ($options !== null)
-            $this->with($options);
+        parent::__construct($options);
 
         ## unregister default autoloader after attaching
         $autoloader->unregister();
@@ -62,7 +57,7 @@ class LoaderAutoloadAggregate
             $name = $this->_aliases[$name];
 
         ## resolve to loader class name by registered autoloaders
-        return $this->_t__by($name);
+        return parent::by($name);
     }
 
     /**
@@ -73,6 +68,36 @@ class LoaderAutoloadAggregate
      */
     function listAttached()
     {
-        return array_merge(array_keys($this->_aliases), $this->_t__listAttached());
+        return array_merge(array_keys($this->_aliases), parent::listAttached());
+    }
+
+    // Implement iLoaderAutoload:
+
+    /**
+     * Register to spl autoloader
+     *
+     * <code>
+     * spl_autoload_register(callable);
+     * </code>
+     *
+     * @param bool $prepend
+     *
+     * @return void
+     */
+    function register($prepend = false)
+    {
+        spl_autoload_register(array($this, 'resolve'), true, $prepend);
+    }
+
+    /**
+     * Unregister from spl autoloader
+     *
+     * ! using same callable on register
+     *
+     * @return void
+     */
+    function unregister()
+    {
+        spl_autoload_unregister(array($this, 'resolve'));
     }
 }

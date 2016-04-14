@@ -1,31 +1,19 @@
 <?php
 namespace Poirot\Loader\Autoloader;
 
-use Poirot\Loader\Traits\tLoaderMapResource;
-
-if (class_exists('Poirot\\Loader\\Autoloader\\LoaderAutoloadClassMap', false))
+if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadClassMap', false))
     return;
 
-require_once __DIR__ . '/aLoaderAutoload.php';
+use Poirot\Loader\Interfaces\iLoaderAutoload;
+use Poirot\Loader\LoaderMapResource;
+
+require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
+require_once __DIR__ . '/../LoaderMapResource.php';
 
 class LoaderAutoloadClassMap
-    extends aLoaderAutoload
+    extends LoaderMapResource
+    implements iLoaderAutoload
 {
-    use tLoaderMapResource {
-        tLoaderMapResource::resolve as protected __t_resolve;
-    }
-
-    /**
-     * Construct
-     *
-     * @param array|string $options
-     */
-    function __construct($options = null)
-    {
-        if ($options !== null)
-            $this->with(self::withOf($options));
-    }
-
     /**
      * Autoload Class Callable
      *
@@ -37,10 +25,40 @@ class LoaderAutoloadClassMap
      */
     function resolve($class)
     {
-        $resolved = $this->__t_resolve($class);
+        $resolved = parent::resolve($class);
         if ($resolved)
             require_once $resolved;
 
         return $resolved;
+    }
+
+    // Implement iLoaderAutoload:
+
+    /**
+     * Register to spl autoloader
+     *
+     * <code>
+     * spl_autoload_register(callable);
+     * </code>
+     *
+     * @param bool $prepend
+     *
+     * @return void
+     */
+    function register($prepend = false)
+    {
+        spl_autoload_register(array($this, 'resolve'), true, $prepend);
+    }
+
+    /**
+     * Unregister from spl autoloader
+     *
+     * ! using same callable on register
+     *
+     * @return void
+     */
+    function unregister()
+    {
+        spl_autoload_unregister(array($this, 'resolve'));
     }
 }

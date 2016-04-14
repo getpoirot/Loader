@@ -1,16 +1,19 @@
 {
-    "name": "poirot/loader",
-    "description": "AutoLoading/Resolver libraries.",
-    "type"       : "library",
-    "authors": [
+    "name": "poirot/loader"
+    , "description": "AutoLoading/Resolver libraries."
+    , "type"       : "library"
+    , "authors": [
         {
-            "name": "Payam Naderi",
-            "email": "naderi.payam@gmail.com",
-            "role": "Developer"
+            "name": "Payam Naderi"
+            , "email": "naderi.payam@gmail.com"
+            , "role": "Developer"
         }
-    ],
-    "target-dir": "Poirot/Loader",
-    "autoload"  : {
+    ]
+    , "require": {
+        "php": ">=5.3.0"
+    }
+    , "target-dir": "Poirot/Loader"
+    , "autoload"  : {
         "psr-0": {
             "Poirot\\Loader": "."
         }

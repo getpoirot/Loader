@@ -1,12 +1,25 @@
 <?php
-namespace Poirot\Loader\Traits;
+## ===================================================
+## | This fix is Code Clone of LoaderAggregate
+## | it will resolve when php not support Traits
+## | @see LoaderAggregate
+
+namespace Poirot\Loader;
 
 use SplPriorityQueue;
 
 use Poirot\Loader\Interfaces\iLoader;
 
-trait tLoaderAggregate
+class LoaderAggregate
+    extends aLoader
 {
+    ## just determine that fixed class loaded in debugs
+    protected $IS_FIX;
+
+    // use tLoaderAggregate;
+
+    ## @see tLoaderAggregate;
+    ## Code Clone <begin> =================================================================
     /**
      * @var SplPriorityQueue
      */
@@ -107,5 +120,61 @@ trait tLoaderAggregate
             $this->_t_loader_aggregate_Queue = new SplPriorityQueue();
 
         return $this->_t_loader_aggregate_Queue;
+    }
+    ## Code Clone <end> ===================================================================
+
+
+    /**
+     * Build Object With Provided Options
+     * > Setup Aggregate Loader
+     *   Options:
+     *  [
+     *    'attach' => [0 => iLoader, $priority => iLoader],
+     *    'Registered\ClassLoader' => [
+    // Options
+     *       'Poirot\AaResponder'  => [APP_DIR_VENDOR.'/poirot/action-responder/Poirot/AaResponder'],
+     *       'Poirot\Application'  => [APP_DIR_VENDOR.'/poirot/application/Poirot/Application'],
+     *    ]
+     *  ]
+     *
+     * @param array $options       Associated Array
+     * @param bool $throwException Throw Exception On Wrong Option
+     *
+     * @throws \Exception
+     * @return $this
+     */
+    function with(array $options, $throwException = false)
+    {
+        # Attach Loader:
+        if (isset($options['attach'])) {
+            $attach = $options['attach'];
+            if(!is_array($attach))
+                $attach = [$attach];
+
+            foreach($attach as $pr => $loader)
+                $this->attach($loader, $pr);
+
+            unset($options['attach']);
+        }
+
+        # Set Loader Specific Config:
+        foreach($options as $loader => $loaderOptions) {
+
+            try{
+                $loader = $this->by($loader);
+            } catch (\Exception $e) {
+                if ($throwException)
+                    throw new \InvalidArgumentException(sprintf(
+                        'Loader (%s) not attached.'
+                        , $loader
+                    ));
+            }
+
+            if (method_exists($loader, 'with'))
+                /** @var \Poirot\Std\Interfaces\Pact\ipConfigurable $loader */
+                $loader->with($loaderOptions);
+        }
+
+        return $this;
     }
 }
