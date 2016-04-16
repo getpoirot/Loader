@@ -9,6 +9,8 @@ namespace Poirot\Loader;
 !class_exists('Poirot/Loader/aLoader', false)
     and require_once __DIR__.'/../aLoader.php';
 
+// TODO exclude resource file consideration and move functionality into Autoloader
+
 class LoaderNamespaceStack
     extends aLoader
 {
@@ -25,6 +27,9 @@ class LoaderNamespaceStack
     protected $_t_loader_namespacestack_Namespaces = array(
         # 'path/stack' => ['path/dir/', 'other/path/dir'],
     );
+
+    /** @var string Separator between Names e.g Path\To\Namespace */
+    protected $_t_loader_namespacestack_Separator = '\\';
 
     protected $_t_loader_namespacestack_cache_SortNamespaces = false;
     protected $_t_loader_namespacestack_cache_Normalized  = array();
@@ -60,15 +65,34 @@ class LoaderNamespaceStack
      */
     function addResource($namespace, $resource)
     {
-        $namespace = trim($namespace, '\\');
+        $namespace = trim($namespace, $this->getSeparator());
 
         if (!array_key_exists($namespace, $this->_t_loader_namespacestack_Namespaces))
             $this->_t_loader_namespacestack_Namespaces[$namespace] = array();
+
+        if (!is_array($this->_t_loader_namespacestack_Namespaces[$namespace]))
+            ## in case of that namespace exists but not defined as array
+            ## [ 'Path\To\NameSpace' => 'Path\To\Resource' ]
+            $this->_t_loader_namespacestack_Namespaces[$namespace] = array(
+                $this->_t_loader_namespacestack_Namespaces[$namespace]
+            );
 
         # each registered namespace can spliced on multiple directory
         $this->_t_loader_namespacestack_Namespaces[$namespace][] = $resource;
 
         return $this;
+    }
+
+    /**
+     * Get Names Separator
+     *
+     * e.g Path\To\Namespace -> "\"
+     *
+     * @return string
+     */
+    function getSeparator()
+    {
+        return $this->_t_loader_namespacestack_Separator;
     }
 
     /**
@@ -81,32 +105,32 @@ class LoaderNamespaceStack
      *    return true;
      * }
      *
-     * @param string   $resourceName
-     * @param \Closure $watch
+     * @param string   $resource
+     * @param Closure $watch
      *
      * @return false|array|mixed
      */
-    function resolve($resourceName, \Closure $watch = null)
+    function resolve($resource, Closure $watch = null)
     {
-        $resourceName = (string) $resourceName;
-        if ($resourceName === '' || empty($this->_t_loader_namespacestack_Namespaces))
+        $resource = (string) $resource;
+        if ($resource === '' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
-        if (isset($this->_t_loader_namespacestack_Namespaces[$resourceName])) {
+        if (isset($this->_t_loader_namespacestack_Namespaces[$resource])) {
             ## whole resource match exists in stack and resolved
-            foreach($this->_t_loader_namespacestack_Namespaces[$resourceName] as $resolved) {
+            foreach($this->_t_loader_namespacestack_Namespaces[$resource] as $resolved) {
                 if ($return = $this->_t_loader_namespacestack_watchResolve($resolved, $watch))
                     return $return;
             }
         }
 
         foreach($this->_t_loader_namespacestack_cache_Matched as $namespace)
-            if (strpos($resourceName, $namespace) === 0) {
-                if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resourceName, $namespace, $watch))
+            if (strpos($resource, $namespace) === 0) {
+                if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resource, $namespace, $watch))
                     return $return;
             }
 
-        $matched = $this->_t_loader_namespacestack_getMatchedFromStack($resourceName);
+        $matched = $this->_t_loader_namespacestack_getMatchedFromStack($resource);
         $this->_t_loader_namespacestack_cache_Matched = array_merge($matched, $this->_t_loader_namespacestack_cache_Matched);
 
         // push wildcard star '*' namespace to matched if exists
@@ -116,7 +140,7 @@ class LoaderNamespaceStack
 
         // search for class library file:
         foreach($matched as $namespace) {
-            if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resourceName, $namespace, $watch))
+            if ($return = $this->_t_loader_namespacestack_attainFromNamespace($resource, $namespace, $watch))
                 return $return;
         }
 
@@ -137,7 +161,8 @@ class LoaderNamespaceStack
         if (!is_array($this->_t_loader_namespacestack_Namespaces[$namespace]))
             ## Allow Loader Config Defined as:
             ## 'Poirot' => __DIR__, instead of 'Poirot' => [__DIR__, ..],
-            $this->_t_loader_namespacestack_Namespaces[$namespace] = [$this->_t_loader_namespacestack_Namespaces[$namespace]];
+            $this->_t_loader_namespacestack_Namespaces[$namespace]
+                = array($this->_t_loader_namespacestack_Namespaces[$namespace]);
 
         foreach ($this->_t_loader_namespacestack_Namespaces[$namespace] as $path) {
             $resolved =
@@ -158,7 +183,7 @@ class LoaderNamespaceStack
      */
     protected function _t_loader_namespacestack_getMatchedFromStack($resource, $rec_namespacestack = null)
     {
-        $matched = [];
+        $matched = array();
         if (empty($rec_namespacestack) && $rec_namespacestack !== null)
             ## list is empty
             return $matched;
@@ -217,10 +242,16 @@ class LoaderNamespaceStack
         }
 
         if ($term > 0)
-            return $this->_t_loader_namespacestack_getMatchedFromStack($resource, array_splice($rec_namespacestack, 0, $midKey));
+            return $this->_t_loader_namespacestack_getMatchedFromStack(
+                $resource
+                , array_splice($rec_namespacestack, 0, $midKey)
+            );
 
         // if ($term < 0)
-        return $this->_t_loader_namespacestack_getMatchedFromStack($resource, array_splice($rec_namespacestack, $midKey, count($keys)-1));
+        return $this->_t_loader_namespacestack_getMatchedFromStack(
+            $resource
+            , array_splice($rec_namespacestack, $midKey, count($keys)-1)
+        );
     }
 
     /**
@@ -263,7 +294,7 @@ class LoaderNamespaceStack
         if (isset($this->_t_loader_namespacestack_cache_Normalized[$dir]))
             return $this->_t_loader_namespacestack_cache_Normalized[$dir];
 
-        $dir = rtrim(strtr($dir, '\\', '/'), '/');
+        $dir = rtrim(strtr($dir, $this->getSeparator(), '/'), '/');
         $this->_t_loader_namespacestack_cache_Normalized[$dir] = $dir;
 
         return $dir;
@@ -278,7 +309,7 @@ class LoaderNamespaceStack
      */
     protected function _t_loader_namespacestack_normalizeResourceName($maskOffClass)
     {
-        $maskOffClass = ltrim($maskOffClass, '\\');
+        $maskOffClass = ltrim($maskOffClass, $this->getSeparator());
 
         return '/'. $this->_t_loader_namespacestack_normalizeDir($maskOffClass);
     }

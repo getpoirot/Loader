@@ -3,7 +3,7 @@ namespace Poirot\Loader\Traits;
 
 use Closure;
 
-// TODO add separator
+// TODO exclude resource file consideration and move functionality into Autoloader
 
 trait tLoaderNamespaceStack
 {
@@ -15,6 +15,9 @@ trait tLoaderNamespaceStack
     protected $_t_loader_namespacestack_Namespaces = array(
         # 'path/stack' => ['path/dir/', 'other/path/dir'],
     );
+
+    /** @var string Separator between Names e.g Path\To\Namespace */
+    protected $_t_loader_namespacestack_Separator = '\\';
 
     protected $_t_loader_namespacestack_cache_SortNamespaces = false;
     protected $_t_loader_namespacestack_cache_Normalized  = array();
@@ -50,15 +53,34 @@ trait tLoaderNamespaceStack
      */
     function addResource($namespace, $resource)
     {
-        $namespace = trim($namespace, '\\');
+        $namespace = trim($namespace, $this->getSeparator());
 
         if (!array_key_exists($namespace, $this->_t_loader_namespacestack_Namespaces))
             $this->_t_loader_namespacestack_Namespaces[$namespace] = array();
+
+        if (!is_array($this->_t_loader_namespacestack_Namespaces[$namespace]))
+            ## in case of that namespace exists but not defined as array
+            ## [ 'Path\To\NameSpace' => 'Path\To\Resource' ]
+            $this->_t_loader_namespacestack_Namespaces[$namespace] = array(
+                $this->_t_loader_namespacestack_Namespaces[$namespace]
+            );
 
         # each registered namespace can spliced on multiple directory
         $this->_t_loader_namespacestack_Namespaces[$namespace][] = $resource;
 
         return $this;
+    }
+
+    /**
+     * Get Names Separator
+     *
+     * e.g Path\To\Namespace -> "\"
+     *
+     * @return string
+     */
+    function getSeparator()
+    {
+        return $this->_t_loader_namespacestack_Separator;
     }
 
     /**
@@ -127,7 +149,8 @@ trait tLoaderNamespaceStack
         if (!is_array($this->_t_loader_namespacestack_Namespaces[$namespace]))
             ## Allow Loader Config Defined as:
             ## 'Poirot' => __DIR__, instead of 'Poirot' => [__DIR__, ..],
-            $this->_t_loader_namespacestack_Namespaces[$namespace] = [$this->_t_loader_namespacestack_Namespaces[$namespace]];
+            $this->_t_loader_namespacestack_Namespaces[$namespace]
+                = array($this->_t_loader_namespacestack_Namespaces[$namespace]);
 
         foreach ($this->_t_loader_namespacestack_Namespaces[$namespace] as $path) {
             $resolved =
@@ -148,7 +171,7 @@ trait tLoaderNamespaceStack
      */
     protected function _t_loader_namespacestack_getMatchedFromStack($resource, $rec_namespacestack = null)
     {
-        $matched = [];
+        $matched = array();
         if (empty($rec_namespacestack) && $rec_namespacestack !== null)
             ## list is empty
             return $matched;
@@ -207,10 +230,16 @@ trait tLoaderNamespaceStack
         }
 
         if ($term > 0)
-            return $this->_t_loader_namespacestack_getMatchedFromStack($resource, array_splice($rec_namespacestack, 0, $midKey));
+            return $this->_t_loader_namespacestack_getMatchedFromStack(
+                $resource
+                , array_splice($rec_namespacestack, 0, $midKey)
+            );
 
         // if ($term < 0)
-        return $this->_t_loader_namespacestack_getMatchedFromStack($resource, array_splice($rec_namespacestack, $midKey, count($keys)-1));
+        return $this->_t_loader_namespacestack_getMatchedFromStack(
+            $resource
+            , array_splice($rec_namespacestack, $midKey, count($keys)-1)
+        );
     }
 
     /**
@@ -253,7 +282,7 @@ trait tLoaderNamespaceStack
         if (isset($this->_t_loader_namespacestack_cache_Normalized[$dir]))
             return $this->_t_loader_namespacestack_cache_Normalized[$dir];
 
-        $dir = rtrim(strtr($dir, '\\', '/'), '/');
+        $dir = rtrim(strtr($dir, $this->getSeparator(), '/'), '/');
         $this->_t_loader_namespacestack_cache_Normalized[$dir] = $dir;
 
         return $dir;
@@ -268,7 +297,7 @@ trait tLoaderNamespaceStack
      */
     protected function _t_loader_namespacestack_normalizeResourceName($maskOffClass)
     {
-        $maskOffClass = ltrim($maskOffClass, '\\');
+        $maskOffClass = ltrim($maskOffClass, $this->getSeparator());
 
         return '/'. $this->_t_loader_namespacestack_normalizeDir($maskOffClass);
     }
