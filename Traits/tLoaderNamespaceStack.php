@@ -113,7 +113,7 @@ trait tLoaderNamespaceStack
         ## Match Whole Resource Name Exists In Stack --------------------------------------------------------------
         #- e.g with new \PathTo\ThisIsClassName() -
         #- 'PathTo\ThisIsClassName' => __DIR__.'/PathTo/ThisIsClassName.php',
-        if (array_key_exists($name, $this->_t_loader_namespacestack_Namespaces[$name])) {
+        if (array_key_exists($name, $this->_t_loader_namespacestack_Namespaces)) {
             if (false !== $return = $this->_t_loader_namespacestack_watchAndResolve($name, $watch))
                 return $return;
             else {
