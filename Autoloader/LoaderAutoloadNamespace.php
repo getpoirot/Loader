@@ -12,10 +12,25 @@ if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadNamespace', false))
 use Poirot\Loader\Interfaces\iLoaderAutoload;
 use Poirot\Loader\LoaderNamespaceStack;
 
+/*
+$loader = new P\Loader\Autoloader\LoaderAutoloadNamespace([
+    'Poirot' => __DIR__,
+    'Poirot\\Loader' => __DIR__.'/Loader',
+    'Poirot\\Loader\\LoaderNamespaceStack' => __DIR__.'/Loader/LoaderNamespaceStack.php',
+
+    # 'Poirot\\Std' => __DIR__.'/Std',
+]);
+
+$resolved = $loader->resolve('Poirot\Std\ErrorStack');
+$errorStack = new P\Std\ErrorStack(); // class will resolved with 'Poirot' =>
+*/
+
 class LoaderAutoloadNamespace
     extends LoaderNamespaceStack
     implements iLoaderAutoload
 {
+    protected $_cache_Normalized  = array();
+
     /**
      * Autoload Class
      *
@@ -27,15 +42,30 @@ class LoaderAutoloadNamespace
      */
     function resolve($class)
     {
-        return parent::resolve($class, function($resolvedFile) {
-            $file = $resolvedFile.'.php';
-            if (!file_exists($file))
+        return parent::resolve($class, function($resource, $match) use ($class)
+        {
+            ## $match        = 'Poirot\Loader'
+            ## $class        = 'Poirot\Loader\ClassMapAutoloader'
+            ## $maskOffClass = '\ClassMapAutoloader'
+            $maskOffClass = ($match == '*')
+                ? $class
+                : substr($class, strlen($match), strlen($class));
+
+            ## we suppose class mask must find within match
+            ## so convert namespaces to directory slashes
+            $concatMatchClass =
+                $this->_normalizeDir($resource)
+                . $this->_normalizeResourceName($maskOffClass);
+
+            $classFilePath = $concatMatchClass.'.php';
+            if (!file_exists($classFilePath))
                 return false;
 
-            require_once $file;
+            ## require file so class can be accessible (AutoLoading Goes Work)
+            require_once $classFilePath;
 
             ## stop propagation
-            return $file;
+            return $classFilePath;
         });
     }
 
@@ -67,5 +97,38 @@ class LoaderAutoloadNamespace
     function unregister()
     {
         spl_autoload_unregister(array($this, 'resolve'));
+    }
+
+
+    // ..
+
+    /**
+     * Normalize Directory Path
+     *
+     * @param string $dir
+     *
+     * @return string
+     */
+    protected function _normalizeDir($dir)
+    {
+        if (isset($this->_cache_Normalized[$dir]))
+            return $this->_cache_Normalized[$dir];
+
+        $dir = rtrim(strtr($dir, $this->getSeparator(), '/'), '/');
+        $this->_cache_Normalized[$dir] = $dir;
+        return $dir;
+    }
+
+    /**
+     * Convert Class Namespace Trailing To Path
+     *
+     * @param string $maskOffClass
+     *
+     * @return string
+     */
+    protected function _normalizeResourceName($maskOffClass)
+    {
+        $maskOffClass = ltrim($maskOffClass, $this->getSeparator());
+        return '/'. $this->_normalizeDir($maskOffClass);
     }
 }
