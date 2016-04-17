@@ -27,54 +27,54 @@ class LoaderMapResource
     /**
      * Set Bunch Of Name/Resource Pair
      *
-     * @param array $resourceMap
+     * @param array $mapResources
      *
      * @return $this
      */
-    function setResources(array $resourceMap)
+    function setResources(array $mapResources)
     {
         # previous registered keys not replaced
-        $this->_t_loader_map_resource_MapRes = array_merge($resourceMap, $this->_t_loader_map_resource_MapRes);
+        $this->_t_loader_map_resource_MapRes = array_merge($mapResources, $this->_t_loader_map_resource_MapRes);
         return $this;
     }
 
     /**
      * Add Namespace Resource/Directory Pair
      *
-     * @param string $namespace
+     * @param string $name
      * @param string $resource Directory Path Or Any Resource Watched
      *
      * @throws \Exception
      * @return $this
      */
-    function addResource($namespace, $resource)
+    function addResource($name, $resource)
     {
-        $namespace = (string) $namespace;
+        $name = (string) $name;
 
-        if (array_key_exists($namespace, $this->_t_loader_map_resource_MapRes))
+        if (array_key_exists($name, $this->_t_loader_map_resource_MapRes))
             throw new \Exception(sprintf(
                 'Resource Map (%s) already exists in map.'
-                , $namespace
+                , $name
             ));
 
-        $this->_t_loader_map_resource_MapRes[$namespace] = $resource;
+        $this->_t_loader_map_resource_MapRes[$name] = $resource;
         return $this;
     }
 
     /**
      * Resolve To Resource By Map
      *
-     * @param string $resourceName
+     * @param string $nameName
      *
      * @return false|mixed
      */
-    function resolve($resourceName)
+    function resolve($nameName)
     {
-        $resourceName = (string) $resourceName;
-        if (!array_key_exists($resourceName, $this->_t_loader_map_resource_MapRes))
+        $nameName = (string) $nameName;
+        if (!array_key_exists($nameName, $this->_t_loader_map_resource_MapRes))
             return false;
 
-        return $this->_t_loader_map_resource_MapRes[$resourceName];
+        return $this->_t_loader_map_resource_MapRes[$nameName];
     }
     ## Code Clone <end> ===================================================================
 

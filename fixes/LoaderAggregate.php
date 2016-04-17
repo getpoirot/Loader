@@ -35,15 +35,15 @@ class LoaderAggregate
     /**
      * Resolve To Resource
      *
-     * @param mixed $resource
+     * @param string $name
      *
      * @return mixed
      */
-    function resolve($resource)
+    function resolve($name)
     {
         $resolve = false;
         /** @var iLoader $loader */
-        foreach (clone $this->_t_loader_aggregate_getQueue() as $loader) {
+        foreach(clone $this->_t_loader_aggregate_getQueue() as $loader) {
             $resolve = call_user_func_array(array($loader, 'resolve'), func_get_args());
             if ($resolve)
                 break;
@@ -57,8 +57,8 @@ class LoaderAggregate
      *
      * - it will store loader can retrieved by ClassName
      *
-     * @param iLoader $loader
-     * @param int $priority
+     * @param iLoader     $loader
+     * @param int         $priority
      *
      * @return $this
      */
@@ -80,20 +80,20 @@ class LoaderAggregate
      *     ->with([..options])
      * [code]
      *
-     * @param string $name Loader Name, default is class name
+     * @param string $loaderName Loader Name, default is class name
      *
      * @throws \Exception Loader class not found
      * @return iLoader
      */
-    function by($name)
+    function by($loaderName)
     {
-        if (!$this->hasAttached($name))
+        if (!$this->hasAttached($loaderName))
             throw new \Exception(sprintf(
                 'Loader with name (%s) has not attached.'
-                , $name
+                , $loaderName
             ));
 
-        return $this->_t_loader_aggregate_Names[$name];
+        return $this->_t_loader_aggregate_Names[$loaderName];
     }
 
     /**
@@ -103,13 +103,13 @@ class LoaderAggregate
      *  $aggregateLoader->hasAttached(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
      * [code]
      *
-     * @param string $name Loader Name, default is class name
+     * @param string $loaderName Loader Name, default is class name
      *
      * @return bool
      */
-    function hasAttached($name)
+    function hasAttached($loaderName)
     {
-        return in_array($name, $this->listAttached());
+        return in_array($loaderName, $this->listAttached());
     }
 
     /**
