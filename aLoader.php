@@ -56,7 +56,7 @@ abstract class aLoader
         if (!is_array($optionsRes))
             throw new \InvalidArgumentException(sprintf(
                 'Resource must be an array, given: (%s).'
-                , \Poirot\Std\flatten($optionsRes)
+                , var_export($optionsRes, true)
             ));
 
         return $optionsRes;

@@ -54,7 +54,7 @@ class LoaderAggregate
                     if (!isset($loader['priority']) || !isset($loader['loader']))
                         throw new \InvalidArgumentException(sprintf(
                             'Invalid Option Provided (%s).'
-                            , \Poirot\Std\flatten($loader)
+                            , var_export($loader, true)
                         ));
 
                     $pr     = $loader['priority'];
