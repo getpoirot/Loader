@@ -1,5 +1,7 @@
 <?php
 ## ===================================================
+## | DO_LEAST_PHPVER_SUPPORT
+## |
 ## | This fix is Code Clone of LoaderNamespaceStack
 ## | it will resolve when php not support Traits
 ## | @see LoaderNamespaceStack
