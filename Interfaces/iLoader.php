@@ -8,7 +8,7 @@ interface iLoader
      *
      * @param string $name
      *
-     * @return mixed Resolved Resource Or Anything
+     * @return mixed|null
      */
     function resolve($name);
 }
