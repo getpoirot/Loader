@@ -165,7 +165,7 @@ class LoaderAggregate
         if (isset($options['attach'])) {
             $attach = $options['attach'];
             if(!is_array($attach))
-                $attach = [$attach];
+                $attach = array($attach);
 
             foreach($attach as $pr => $loader) {
                 if (is_array($loader)) {
@@ -200,7 +200,7 @@ class LoaderAggregate
 
             if (method_exists($loader, 'with'))
                 /** @var \Poirot\Std\Interfaces\Pact\ipConfigurable $loader */
-                $loader->with($loaderOptions);
+                $loader->with($loader::withOf($loaderOptions));
         }
 
         return $this;
