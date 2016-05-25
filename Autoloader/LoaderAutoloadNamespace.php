@@ -40,7 +40,7 @@ class LoaderAutoloadNamespace
      *
      * @return mixed
      */
-    function resolve($class)
+    function resolve($class, \Closure $__resolve_compatible = null)
     {
         return parent::resolve($class, function($resource, $match) use ($class)
         {
