@@ -19,6 +19,27 @@ class LoaderNamespaceStack
     ## just determine that fixed class loaded in debugs
     protected $IS_FIX;
 
+    protected $watch;
+    
+    /**
+     * Construct
+     *
+     * @param array|string $options
+     * @param callable $watch
+     */
+    function __construct($options = null, $watch = null)
+    {
+        if (is_callable($options)) {
+            $watch   = $options;
+            $options = null;
+        }
+        
+        if ($watch !== null)
+            $this->watch = $watch;
+        
+        parent::__construct($options);
+    }
+    
     // use tLoaderNamespaceStack;
 
     ## @see tLoaderNamespaceStack;
@@ -109,7 +130,7 @@ class LoaderNamespaceStack
      * Resolve To Resource
      *
      * $watch:
-     * function($resource, $match) use ($name) {
+     * function($name, $resource, $match) {
      *    ## $match    = 'Poirot\Loader'
      *    ## $resource = '/var/www/html/vendor/Loader'
      *    ## $name     = 'Poirot\Loader\ClassMapAutoloader'
@@ -126,11 +147,14 @@ class LoaderNamespaceStack
         if ($name === '' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
+        if ($watch === null)
+            $watch = $this->watch; // given from construct
+        
         ## Match Whole Resource Name Exists In Stack --------------------------------------------------------------
         #- e.g with new \PathTo\ThisIsClassName() -
         #- 'PathTo\ThisIsClassName' => __DIR__.'/PathTo/ThisIsClassName.php',
         if (array_key_exists($name, $this->_t_loader_namespacestack_Namespaces)) {
-            if (false !== $return = $this->_t_loader_namespacestack_watchAndResolve($name, $watch))
+            if (false !== $return = $this->_t_loader_namespacestack_watchAndResolve($name, $name, $watch))
                 return $return;
             else {
                 ## Continue it may find on other matches
@@ -166,7 +190,7 @@ class LoaderNamespaceStack
             array_push($matched, '*');
 
         foreach($matched as $match) {
-            $return = $this->_t_loader_namespacestack_watchAndResolve($match, $watch);
+            $return = $this->_t_loader_namespacestack_watchAndResolve($name, $match, $watch);
             if ($return !== false) return $return;
         }
 
@@ -302,7 +326,7 @@ class LoaderNamespaceStack
      *
      * @return false|mixed
      */
-    protected function _t_loader_namespacestack_watchAndResolve($match, $resolveWatch)
+    protected function _t_loader_namespacestack_watchAndResolve($name, $match, $resolveWatch)
     {
         ($resolveWatch !== null) ?: $resolveWatch = function($resource) {
             return ($resource) ? $resource : false;
@@ -313,7 +337,7 @@ class LoaderNamespaceStack
 
         $return = false;
         foreach($this->_t_loader_namespacestack_Namespaces[$match] as $resource) {
-            $return = $resolveWatch($resource, $match);
+            $return = $resolveWatch($name, $resource, $match);
         }
 
         return $return;

@@ -93,7 +93,7 @@ trait tLoaderNamespaceStack
      * Resolve To Resource
      *
      * $watch:
-     * function($resource, $match) use ($name) {
+     * function($name, $resource, $match) {
      *    ## $match    = 'Poirot\Loader'
      *    ## $resource = '/var/www/html/vendor/Loader'
      *    ## $name     = 'Poirot\Loader\ClassMapAutoloader'
@@ -110,11 +110,14 @@ trait tLoaderNamespaceStack
         if ($name === '' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
+        if ($watch === null)
+            $watch = $this->watch; // given from construct
+
         ## Match Whole Resource Name Exists In Stack --------------------------------------------------------------
         #- e.g with new \PathTo\ThisIsClassName() -
         #- 'PathTo\ThisIsClassName' => __DIR__.'/PathTo/ThisIsClassName.php',
         if (array_key_exists($name, $this->_t_loader_namespacestack_Namespaces)) {
-            if (false !== $return = $this->_t_loader_namespacestack_watchAndResolve($name, $watch))
+            if (false !== $return = $this->_t_loader_namespacestack_watchAndResolve($name, $name, $watch))
                 return $return;
             else {
                 ## Continue it may find on other matches
@@ -150,7 +153,7 @@ trait tLoaderNamespaceStack
             array_push($matched, '*');
 
         foreach($matched as $match) {
-            $return = $this->_t_loader_namespacestack_watchAndResolve($match, $watch);
+            $return = $this->_t_loader_namespacestack_watchAndResolve($name, $match, $watch);
             if ($return !== false) return $return;
         }
 
@@ -286,7 +289,7 @@ trait tLoaderNamespaceStack
      *
      * @return false|mixed
      */
-    protected function _t_loader_namespacestack_watchAndResolve($match, $resolveWatch)
+    protected function _t_loader_namespacestack_watchAndResolve($name, $match, $resolveWatch)
     {
         ($resolveWatch !== null) ?: $resolveWatch = function($resource) {
             return ($resource) ? $resource : false;
@@ -297,7 +300,7 @@ trait tLoaderNamespaceStack
 
         $return = false;
         foreach($this->_t_loader_namespacestack_Namespaces[$match] as $resource) {
-            $return = $resolveWatch($resource, $match);
+            $return = $resolveWatch($name, $resource, $match);
         }
 
         return $return;

@@ -42,7 +42,9 @@ class LoaderAutoloadNamespace
      */
     function resolve($class, \Closure $__resolve_compatible = null)
     {
-        return parent::resolve($class, function($resource, $match) use ($class)
+        $self = $this;
+        // TODO as callable(file_extension, $_ = null)
+        return parent::resolve($class, function($class, $resource, $match) use ($self)
         {
             ## $match        = 'Poirot\Loader'
             ## $class        = 'Poirot\Loader\ClassMapAutoloader'
@@ -54,8 +56,8 @@ class LoaderAutoloadNamespace
             ## we suppose class mask must find within match
             ## so convert namespaces to directory slashes
             $concatMatchClass =
-                $this->_normalizeDir($resource)
-                . $this->_normalizeResourceName($maskOffClass);
+                  $self->_normalizeDir($resource)
+                . $self->_normalizeResourceName($maskOffClass);
 
             $classFilePath = $concatMatchClass.'.php';
             if (!file_exists($classFilePath))

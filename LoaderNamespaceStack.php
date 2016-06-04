@@ -19,6 +19,28 @@ class LoaderNamespaceStack
 {
     use tLoaderNamespaceStack;
 
+    protected $watch;
+
+    /**
+     * Construct
+     *
+     * @param array|string $options
+     * @param callable $watch
+     */
+    function __construct($options = null, $watch = null)
+    {
+        if (is_callable($options)) {
+            $watch   = $options;
+            $options = null;
+        }
+
+        if ($watch !== null)
+            $this->watch = $watch;
+
+        parent::__construct($options);
+    }
+    
+    
     ## @see fixes/LoaderNamespaceStack;
     ## Code Clone <begin> =================================================================
     /**
