@@ -15,7 +15,10 @@
     , "target-dir": "Poirot/Loader"
     , "autoload"  : {
         "psr-0": {
-            "Poirot\\Loader": "."
+          "Poirot\\Loader": "."
         }
+        , "files": [
+          "_functions.php"
+        ]
     }
 }

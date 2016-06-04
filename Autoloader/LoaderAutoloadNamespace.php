@@ -9,6 +9,8 @@ if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadNamespace', false))
 !interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false)
     and require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
+require_once __DIR__.'/../_functions.php';
+
 use Poirot\Loader\Interfaces\iLoaderAutoload;
 use Poirot\Loader\LoaderNamespaceStack;
 
@@ -42,32 +44,13 @@ class LoaderAutoloadNamespace
      */
     function resolve($class, \Closure $__resolve_compatible = null)
     {
-        $self = $this;
-        // TODO as callable(file_extension, $_ = null)
-        return parent::resolve($class, function($class, $resource, $match) use ($self)
-        {
-            ## $match        = 'Poirot\Loader'
-            ## $class        = 'Poirot\Loader\ClassMapAutoloader'
-            ## $maskOffClass = '\ClassMapAutoloader'
-            $maskOffClass = ($match == '*')
-                ? $class
-                : substr($class, strlen($match), strlen($class));
-
-            ## we suppose class mask must find within match
-            ## so convert namespaces to directory slashes
-            $concatMatchClass =
-                  $self->_normalizeDir($resource)
-                . $self->_normalizeResourceName($maskOffClass);
-
-            $classFilePath = $concatMatchClass.'.php';
-            if (!file_exists($classFilePath))
+        return parent::resolve($class, function($class, $resource, $match) {
+            if (false === $fileIncludeClass = \Poirot\Loader\watchFileExists($class, $resource, $match, '.php'))
                 return false;
 
             ## require file so class can be accessible (AutoLoading Goes Work)
-            require_once $classFilePath;
-
-            ## stop propagation
-            return $classFilePath;
+            require_once $fileIncludeClass;
+            return $fileIncludeClass;
         });
     }
 
@@ -99,38 +82,5 @@ class LoaderAutoloadNamespace
     function unregister()
     {
         spl_autoload_unregister(array($this, 'resolve'));
-    }
-
-
-    // ..
-
-    /**
-     * Normalize Directory Path
-     *
-     * @param string $dir
-     *
-     * @return string
-     */
-    protected function _normalizeDir($dir)
-    {
-        if (isset($this->_cache_Normalized[$dir]))
-            return $this->_cache_Normalized[$dir];
-
-        $dir = rtrim(strtr($dir, $this->getSeparator(), '/'), '/');
-        $this->_cache_Normalized[$dir] = $dir;
-        return $dir;
-    }
-
-    /**
-     * Convert Class Namespace Trailing To Path
-     *
-     * @param string $maskOffClass
-     *
-     * @return string
-     */
-    protected function _normalizeResourceName($maskOffClass)
-    {
-        $maskOffClass = ltrim($maskOffClass, $this->getSeparator());
-        return '/'. $this->_normalizeDir($maskOffClass);
     }
 }

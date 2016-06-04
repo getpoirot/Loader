@@ -1,6 +1,8 @@
 <?php
 namespace Poirot\Loader\Traits;
 
+require_once __DIR__.'/../_functions.php';
+
 use Closure;
 
 trait tLoaderNamespaceStack
@@ -13,9 +15,6 @@ trait tLoaderNamespaceStack
     protected $_t_loader_namespacestack_Namespaces = array(
         # 'path/stack' => ['path/dir/', 'other/path/dir'],
     );
-
-    /** @var string Separator between Names e.g Path\To\Namespace */
-    protected $_t_loader_namespacestack_Separator = '\\';
 
     protected $_t_loader_namespacestack_cache_SortNamespaces = false;
     protected $_t_loader_namespacestack_cache_Matched     = array(
@@ -60,7 +59,7 @@ trait tLoaderNamespaceStack
      */
     function addResource($name, $resource)
     {
-        $name = trim($name, $this->getSeparator());
+        $name = trim($name, \Poirot\Loader\SEPARATOR_NAMESPACES);
 
         if (!array_key_exists($name, $this->_t_loader_namespacestack_Namespaces))
             $this->_t_loader_namespacestack_Namespaces[$name] = array();
@@ -75,18 +74,6 @@ trait tLoaderNamespaceStack
         $this->_t_loader_namespacestack_cache_Matched[$fc] = array();
 
         return $this;
-    }
-
-    /**
-     * Get Names Separator
-     *
-     * e.g Path\To\Namespace -> "\"
-     *
-     * @return string
-     */
-    function getSeparator()
-    {
-        return $this->_t_loader_namespacestack_Separator;
     }
 
     /**
@@ -106,7 +93,7 @@ trait tLoaderNamespaceStack
      */
     function resolve($name, Closure $watch = null)
     {
-        $name = trim((string) $name, $this->getSeparator());
+        $name = trim((string) $name, \Poirot\Loader\SEPARATOR_NAMESPACES);
         if ($name === '' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
@@ -204,7 +191,7 @@ trait tLoaderNamespaceStack
 
         ## grab the middle
         $midKey  = intval(count($keys) / 2);
-        $curRegisteredName = trim($keys[$midKey], $this->getSeparator());
+        $curRegisteredName = trim($keys[$midKey], \Poirot\Loader\SEPARATOR_NAMESPACES);
 
         if ($curRegisteredName == '*')
             return $matched;
@@ -218,7 +205,7 @@ trait tLoaderNamespaceStack
 
             for($i = $midKey-1; $i >=0; $i--) {
                 ### previous
-                $curRegisteredName = trim($keys[$i], $this->getSeparator());
+                $curRegisteredName = trim($keys[$i], \Poirot\Loader\SEPARATOR_NAMESPACES);
                 $term    = strncasecmp($curRegisteredName, $name, strlen($curRegisteredName));
                 if ($term !== 0)
                     break;
@@ -229,7 +216,7 @@ trait tLoaderNamespaceStack
 
             for($i = $midKey+1; $i < count($keys); $i++) {
                 ### next
-                $curRegisteredName = trim($keys[$i], $this->getSeparator());
+                $curRegisteredName = trim($keys[$i], \Poirot\Loader\SEPARATOR_NAMESPACES);
                 $term    = strncasecmp($curRegisteredName, $name, strlen($curRegisteredName));
                 if ($term !== 0)
                     break;
