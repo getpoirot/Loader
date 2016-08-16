@@ -71,7 +71,7 @@ class LoaderAggregate
         foreach($options as $loader => $loaderOptions) {
 
             try{
-                $loader = $this->by($loader);
+                $loader = $this->loader($loader);
             } catch (\Exception $e) {
                 if ($throwException)
                     throw new \InvalidArgumentException(sprintf(

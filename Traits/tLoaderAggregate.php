@@ -71,7 +71,7 @@ trait tLoaderAggregate
      * @throws \Exception Loader class not found
      * @return iLoader
      */
-    function by($loaderName)
+    function loader($loaderName)
     {
         if (!$this->hasAttached($loaderName))
             throw new \Exception(sprintf(

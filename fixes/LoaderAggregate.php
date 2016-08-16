@@ -87,7 +87,7 @@ class LoaderAggregate
      * @throws \Exception Loader class not found
      * @return iLoader
      */
-    function by($loaderName)
+    function loader($loaderName)
     {
         if (!$this->hasAttached($loaderName))
             throw new \Exception(sprintf(
@@ -189,7 +189,7 @@ class LoaderAggregate
         foreach($options as $loader => $loaderOptions) {
 
             try{
-                $loader = $this->by($loader);
+                $loader = $this->loader($loader);
             } catch (\Exception $e) {
                 if ($throwException)
                     throw new \InvalidArgumentException(sprintf(
