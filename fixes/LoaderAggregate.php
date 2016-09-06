@@ -198,9 +198,10 @@ class LoaderAggregate
                     ));
             }
 
-            if (method_exists($loader, 'with'))
+            if (method_exists($loader, 'with')) {
                 /** @var \Poirot\Std\Interfaces\Pact\ipConfigurable $loader */
-                $loader->with($loader::withOf($loaderOptions));
+                $loader->with($loader::parseWith($loaderOptions));
+            }
         }
 
         return $this;
