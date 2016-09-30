@@ -19,7 +19,7 @@ class LoaderAggregate
     extends aLoader
 {
     ## just determine that fixed class loaded in debugs
-    protected $IS_FIX;
+    protected $IS_FIX = true;
 
     // use tLoaderAggregate;
 
