@@ -131,7 +131,7 @@ class LoaderNamespaceStack
     function resolve($name, Closure $watch = null)
     {
         $name = trim((string) $name, \Poirot\Loader\SEPARATOR_NAMESPACES);
-        if ($name === '' || empty($this->_t_loader_namespacestack_Namespaces))
+        if ($name === '' || $name === '*' || $name === '**' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
         if ($watch === null)
@@ -175,6 +175,10 @@ class LoaderNamespaceStack
         ### push wildcard star '*' namespace to matched if exists
         if (array_key_exists('*', $this->_t_loader_namespacestack_Namespaces))
             array_push($matched, '*');
+
+        ### prepend force wildcard to the beginning of an array list to match first
+        if (array_key_exists('**', $this->_t_loader_namespacestack_Namespaces))
+            array_unshift($matched, '**');
 
         foreach($matched as $match) {
             $return = $this->_t_loader_namespacestack_watchAndResolve($name, $match, $watch);
@@ -230,7 +234,7 @@ class LoaderNamespaceStack
         $midKey  = intval(count($keys) / 2);
         $curRegisteredName = trim($keys[$midKey], \Poirot\Loader\SEPARATOR_NAMESPACES);
 
-        if ($curRegisteredName == '*')
+        if ($curRegisteredName == '*' || $curRegisteredName == '**')
             return $matched;
 
         $term = strncasecmp($curRegisteredName, $name, strlen($curRegisteredName));
@@ -324,7 +328,8 @@ class LoaderNamespaceStack
 
         $return = false;
         foreach($this->_t_loader_namespacestack_Namespaces[$match] as $resource) {
-            $return = $resolveWatch($name, $resource, $match);
+            if ($return = $resolveWatch($name, $resource, $match))
+                break;
         }
 
         return $return;

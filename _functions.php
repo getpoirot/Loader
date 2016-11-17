@@ -29,7 +29,7 @@ namespace Poirot\Loader;
             ## $match        = 'Poirot\Loader'
             ## $name         = 'Poirot\Loader\ClassMapAutoloader'
             ## $maskOffClass = '\ClassMapAutoloader'
-            $maskOffClass = ($match == '*')
+            $maskOffClass = ($match == '*' || $match == '**')
                 ? $name
                 : substr($name, strlen($match), strlen($name));
 

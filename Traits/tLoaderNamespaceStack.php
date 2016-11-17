@@ -94,7 +94,7 @@ trait tLoaderNamespaceStack
     function resolve($name, Closure $watch = null)
     {
         $name = trim((string) $name, \Poirot\Loader\SEPARATOR_NAMESPACES);
-        if ($name === '' || empty($this->_t_loader_namespacestack_Namespaces))
+        if ($name === '' || $name === '*' || $name === '**' || empty($this->_t_loader_namespacestack_Namespaces))
             return false;
 
         if ($watch === null)
@@ -111,8 +111,10 @@ trait tLoaderNamespaceStack
             }
         }
 
-        ## Check Request Name Against Registered and Save List As Cache  ------------------------------------------
+
         $fc = strtoupper($name[0]);
+
+        ## Check Request Name Against Registered and Save List As Cache  ------------------------------------------
         if (isset($this->_t_loader_namespacestack_cache_Matched[$fc])) {
             ## given match from cache
             foreach($this->_t_loader_namespacestack_cache_Matched[$fc] as $registeredNames)
@@ -139,9 +141,13 @@ trait tLoaderNamespaceStack
         if (array_key_exists('*', $this->_t_loader_namespacestack_Namespaces))
             array_push($matched, '*');
 
+        ### prepend force wildcard to the beginning of an array list to match first
+        if (array_key_exists('**', $this->_t_loader_namespacestack_Namespaces))
+            array_unshift($matched, '**');
+
         foreach($matched as $match) {
-            $return = $this->_t_loader_namespacestack_watchAndResolve($name, $match, $watch);
-            if ($return !== false) return $return;
+            if ( false !== $return = $this->_t_loader_namespacestack_watchAndResolve($name, $match, $watch) )
+                return $return;
         }
 
         return false;
@@ -193,7 +199,7 @@ trait tLoaderNamespaceStack
         $midKey  = intval(count($keys) / 2);
         $curRegisteredName = trim($keys[$midKey], \Poirot\Loader\SEPARATOR_NAMESPACES);
 
-        if ($curRegisteredName == '*')
+        if ($curRegisteredName == '*' || $curRegisteredName == '**')
             return $matched;
 
         $term = strncasecmp($curRegisteredName, $name, strlen($curRegisteredName));
@@ -287,7 +293,8 @@ trait tLoaderNamespaceStack
 
         $return = false;
         foreach($this->_t_loader_namespacestack_Namespaces[$match] as $resource) {
-            $return = $resolveWatch($name, $resource, $match);
+            if ($return = $resolveWatch($name, $resource, $match))
+                break;
         }
 
         return $return;
