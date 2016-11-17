@@ -62,17 +62,22 @@ class LoaderAggregate
         }
 
         # Set Loader Specific Config:
-        foreach($options as $loader => $loaderOptions) {
-
+        foreach($options as $loader => $loaderOptions)
+        {
             try{
                 $loader = $this->loader($loader);
             } catch (\Exception $e) {
-                if ($throwException)
+                if ($throwException) {
                     throw new \InvalidArgumentException(sprintf(
                         'Loader (%s) not attached.'
                         , $loader
                     ));
+                }
             }
+
+            if (!is_object($loader))
+                // Exception Rise And Catch!!
+                continue;
 
             if (method_exists($loader, 'with')) {
                 /** @var \Poirot\Std\Interfaces\Pact\ipConfigurable $loader */

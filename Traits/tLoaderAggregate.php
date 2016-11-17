@@ -16,6 +16,7 @@ trait tLoaderAggregate
         # Used to get loader instances
         ## 'LoaderName_Or_ClassName' => iLoader
     );
+    protected $_c__normalized = array();
 
 
     /**
@@ -53,6 +54,7 @@ trait tLoaderAggregate
         $this->_t_loader_aggregate_getQueue()->insert($loader, $priority);
 
         $loaderClass = get_class($loader);
+        $loaderClass = $this->_normalizeLoaderName($loaderClass);
         $this->_t_loader_aggregate_Names[$loaderClass] = $loader;
 
         return $this;
@@ -62,7 +64,7 @@ trait tLoaderAggregate
      * Get Loader By Name
      *
      * [code:]
-     *  $aggregateLoader->by(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
+     *  $aggregateLoader->loader(\Poirot\Loader\Autoloader\LoaderAutoloadNamespace::class)
      *     ->with([..options])
      * [code]
      *
@@ -73,6 +75,8 @@ trait tLoaderAggregate
      */
     function loader($loaderName)
     {
+        $loaderName = $this->_normalizeLoaderName($loaderName);
+
         if (!$this->hasAttached($loaderName))
             throw new \Exception(sprintf(
                 'Loader with name (%s) has not attached.'
@@ -95,6 +99,7 @@ trait tLoaderAggregate
      */
     function hasAttached($loaderName)
     {
+        $loaderName = $this->_normalizeLoaderName($loaderName);
         return in_array($loaderName, $this->listAttached());
     }
 
@@ -118,6 +123,16 @@ trait tLoaderAggregate
             $this->_t_loader_aggregate_Queue = new SplPriorityQueue();
 
         return $this->_t_loader_aggregate_Queue;
+    }
+
+    protected function _normalizeLoaderName($loaderName)
+    {
+        $loaderName = (string) $loaderName;
+        if (isset($this->_c__normalized[$loaderName]))
+            return $this->_c__normalized[$loaderName];
+
+        $normalized = ltrim($loaderName, '\\');
+        return $this->_c__normalized[$loaderName] = $normalized;
     }
     ## Code Clone <end> ===================================================================
 }
