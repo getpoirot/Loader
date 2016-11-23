@@ -114,6 +114,16 @@ class LoaderNamespaceStack
     }
 
     /**
+     * List Resources
+     *
+     * @return array
+     */
+    function listResources()
+    {
+        return $this->_t_loader_namespacestack_Namespaces;
+    }
+
+    /**
      * Resolve To Resource
      *
      * $watch:
