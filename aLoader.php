@@ -6,6 +6,7 @@ namespace Poirot\Loader;
 
 use Poirot\Loader\Interfaces\iLoader;
 
+
 abstract class aLoader
     implements iLoader
     # , ipConfigurable // removed in case of dependency reduction
@@ -13,12 +14,16 @@ abstract class aLoader
     /**
      * Construct
      *
+     * $options:
+     * ! given string is filepath to a file that
+     *   return array when included.
+     *
      * @param array|string $options
      */
     function __construct($options = null)
     {
         if ($options !== null)
-            $this->with(static::withOf($options));
+            $this->with(static::parseWith($options));
     }
 
 
@@ -41,10 +46,10 @@ abstract class aLoader
      * @throws \InvalidArgumentException if resource not supported
      * @return array
      */
-    static function withOf($optionsRes)
+    final static function parseWith($optionsRes)
     {
         if (is_string($optionsRes)) {
-            if (!file_exists($optionsRes))
+            if (! file_exists($optionsRes) )
                 throw new \InvalidArgumentException(sprintf(
                     'Map file "%s" provided does not exist.',
                     $optionsRes
@@ -53,7 +58,7 @@ abstract class aLoader
             $optionsRes = include $optionsRes;
         }
 
-        if (!is_array($optionsRes))
+        if (! is_array($optionsRes) )
             throw new \InvalidArgumentException(sprintf(
                 'Resource must be an array, given: (%s).'
                 , var_export($optionsRes, true)

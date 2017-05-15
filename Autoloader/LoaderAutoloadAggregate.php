@@ -9,6 +9,7 @@ if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadAggregate', false))
 !interface_exists('Poirot\Loader\Interfaces\iLoaderAutoload', false)
     and require_once __DIR__ . '/../Interfaces/iLoaderAutoload.php';
 
+
 use Poirot\Loader\LoaderAggregate;
 use Poirot\Loader\Interfaces\iLoaderAutoload;
 

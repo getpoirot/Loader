@@ -6,7 +6,9 @@ namespace Poirot\Loader;
 !trait_exists('Poirot\Loader\Traits\tLoaderNamespaceStack', false)
     and require_once __DIR__.'/Traits/tLoaderNamespaceStack.php';
 
+
 use Poirot\Loader\Traits\tLoaderNamespaceStack;
+
 
 class LoaderNamespaceStack
     extends aLoader

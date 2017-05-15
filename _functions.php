@@ -20,7 +20,7 @@ namespace Poirot\Loader;
      * 
      * @return string resolved path to file if exists
      */
-    function watchFileExists($name, $resource, $match, $postfix = null)
+    function funcWatchFileExists($name, $resource, $match, $postfix = null)
     {
         if (is_file($match))
             $pathToFile = $match;
@@ -40,7 +40,7 @@ namespace Poirot\Loader;
                 . _normalizeResourceName($maskOffClass);
             
             if ($postfix !== null) $pathToFile.=$postfix;
-            if (!file_exists($pathToFile))
+            if (! file_exists($pathToFile) )
                 return false;
         }
 

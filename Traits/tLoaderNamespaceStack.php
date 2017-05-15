@@ -136,7 +136,7 @@ trait tLoaderNamespaceStack
 
         // ..
 
-        if (!isset($matched)) {
+        if (! isset($matched) ) {
             ## not loaded from internal cache
             $matched = $this->_t_loader_namespacestack_getMatchedFromStack($name);
             $this->_t_loader_namespacestack_cache_Matched[$fc] = array_merge(

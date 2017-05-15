@@ -40,12 +40,12 @@ class LoaderAggregate
         # Attach Loader:
         if (isset($options['attach'])) {
             $attach = $options['attach'];
-            if(!is_array($attach))
+            if(! is_array($attach) )
                 $attach = array($attach);
 
             foreach($attach as $pr => $loader) {
                 if (is_array($loader)) {
-                    if (!isset($loader['priority']) || !isset($loader['loader']))
+                    if ( !isset($loader['priority']) || !isset($loader['loader']) )
                         throw new \InvalidArgumentException(sprintf(
                             'Invalid Option Provided (%s).'
                             , var_export($loader, true)
@@ -75,13 +75,13 @@ class LoaderAggregate
                 }
             }
 
-            if (!is_object($loader))
+            if (! is_object($loader) )
                 // Exception Rise And Catch!!
                 continue;
 
             if (method_exists($loader, 'with')) {
                 /** @var \Poirot\Std\Interfaces\Pact\ipConfigurable $loader */
-                $loader->with($loader::withOf($loaderOptions));
+                $loader->with( $loader::parseWith($loaderOptions) );
             }
         }
 

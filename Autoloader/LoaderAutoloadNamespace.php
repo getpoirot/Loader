@@ -45,7 +45,7 @@ class LoaderAutoloadNamespace
     function resolve($class, \Closure $__resolve_compatible = null)
     {
         return parent::resolve($class, function($class, $resource, $match) {
-            if (false === $fileIncludeClass = \Poirot\Loader\watchFileExists($class, $resource, $match, '.php'))
+            if (false === $fileIncludeClass = \Poirot\Loader\funcWatchFileExists($class, $resource, $match, '.php'))
                 return false;
 
             ## require file so class can be accessible (AutoLoading Goes Work)
