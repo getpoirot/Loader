@@ -33,7 +33,7 @@ trait tLoaderNamespaceStack
     function setResources(array $namespaces)
     {
         # previous registered keys not replaced
-        $this->_t_loader_namespacestack_Namespaces = array_merge(
+        $this->_t_loader_namespacestack_Namespaces = array_merge_recursive(
             $this->_t_loader_namespacestack_Namespaces
             , $namespaces
         );
