@@ -192,7 +192,8 @@ trait tLoaderNamespaceStack
             return $matched;
 
         if ($this->_t_loader_namespacestack_cache_SortNamespaces !== $this->_t_loader_namespacestack_Namespaces) {
-            ksort($this->_t_loader_namespacestack_Namespaces);
+            // case-insensitive sort
+            uksort($this->_t_loader_namespacestack_Namespaces, 'strcasecmp');
             $this->_t_loader_namespacestack_cache_SortNamespaces = $this->_t_loader_namespacestack_Namespaces;
         }
 
