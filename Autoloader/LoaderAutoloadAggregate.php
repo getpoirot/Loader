@@ -1,4 +1,5 @@
 <?php
+// TODO using apc cache
 namespace Poirot\Loader\Autoloader;
 
 if (class_exists('Poirot\Loader\Autoloader\LoaderAutoloadAggregate', false))
