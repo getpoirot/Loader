@@ -114,6 +114,38 @@ class LoaderNamespaceStack
     }
 
     /**
+     * Prepend Namespace Stack Resource/Directory Pair
+     *
+     * - namespace can be '*'
+     *   the star wildcard will check with watch-
+     *   for any resource that not detect namespace match
+     *
+     * @param string $name
+     * @param string $resource  Directory Path Or Any Resource Watched
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    function prependResource($name, $resource)
+    {
+        $name = trim($name, \Poirot\Loader\SEPARATOR_NAMESPACES);
+
+        if (!array_key_exists($name, $this->_t_loader_namespacestack_Namespaces))
+            $this->_t_loader_namespacestack_Namespaces[$name] = array();
+
+        $this->_t_loader_namespacestack_fixResourceList($name);
+
+        # each registered namespace can spliced on multiple directory
+        array_unshift($this->_t_loader_namespacestack_Namespaces[$name], $resource);
+
+        ## clear matched resource cache
+        $fc = strtoupper($name[0]);
+        $this->_t_loader_namespacestack_cache_Matched[$fc] = array();
+
+        return $this;
+    }
+
+    /**
      * List Resources
      *
      * @return array
