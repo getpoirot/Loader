@@ -46,7 +46,7 @@ abstract class aLoader
      * @throws \InvalidArgumentException if resource not supported
      * @return array
      */
-    final static function parseWith($optionsRes)
+    final static function parseWith($optionsRes, array $_ = null)
     {
         if (is_string($optionsRes)) {
             if (! file_exists($optionsRes) )
